@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  Image,
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -19,6 +20,7 @@ const cartItems = [
     category: 'T-Shirts',
     price: 25,
     quantity: 1,
+    image: require('../assets/classic-navyblue-shirt.webp'),
   },
   {
     id: '2',
@@ -26,6 +28,7 @@ const cartItems = [
     category: 'Jackets',
     price: 55,
     quantity: 1,
+    image: require('../assets/casualjacket.jpg'),
   },
 ];
 
@@ -69,10 +72,10 @@ export default function CartScreen() {
           >
             {/* Product Image */}
             <View style={styles.productImage}>
-              <Ionicons
-                name="shirt-outline"
-                size={45}
-                color={lightColors.primaryLight}
+              <Image
+                source={item.image}
+                style={styles.productImageStyle}
+                resizeMode="cover"
               />
             </View>
 
@@ -248,6 +251,12 @@ const styles = StyleSheet.create({
     backgroundColor: lightColors.inputBg,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+
+  productImageStyle: {
+    width: '100%',
+    height: '100%',
   },
 
   productInfo: {

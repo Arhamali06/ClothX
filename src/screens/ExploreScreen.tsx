@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -6,80 +6,73 @@ import {
   TextInput,
   Pressable,
   FlatList,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from '@expo/vector-icons/Ionicons';
+  Image,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { lightColors } from '../constants/colors';
-import sizes from '../constants/sizes';
+import { lightColors } from "../constants/colors";
+import sizes from "../constants/sizes";
 
 const products = [
   {
-    id: '1',
-    name: 'Classic Black T-Shirt',
-    category: 'T-Shirts',
-    price: '$25.00',
-    icon: 'shirt-outline' as const,
+    id: "1",
+    name: "Classic NavyBlue T-Shirt",
+    category: "T-Shirts",
+    price: "$25.00",
+    image: require("../assets/classic-navyblue-shirt.webp"),
   },
   {
-    id: '2',
-    name: 'Oversized White T-Shirt',
-    category: 'T-Shirts',
-    price: '$28.00',
-    icon: 'shirt-outline' as const,
+    id: "2",
+    name: "Oversized White T-Shirt",
+    category: "T-Shirts",
+    price: "$28.00",
+    image: require("../assets/oversized-white.webp"),
   },
   {
-    id: '3',
-    name: 'Casual Denim Jacket',
-    category: 'Jackets',
-    price: '$55.00',
-    icon: 'shirt-outline' as const,
+    id: "3",
+    name: "Casual Denim Jacket",
+    category: "Jackets",
+    price: "$55.00",
+    image: require("../assets/denimajcket.jpg"),
   },
   {
-    id: '4',
-    name: 'Classic Blue Jeans',
-    category: 'Jeans',
-    price: '$45.00',
-    icon: 'layers-outline' as const,
+    id: "4",
+    name: "Classic Blue Jeans",
+    category: "Jeans",
+    price: "$45.00",
+    image: require("../assets/bluejeans.jpg"),
   },
   {
-    id: '5',
-    name: 'Relaxed Fit Hoodie',
-    category: 'Hoodies',
-    price: '$40.00',
-    icon: 'shirt-outline' as const,
+    id: "5",
+    name: "Relaxed Fit Hoodie",
+    category: "Hoodies",
+    price: "$40.00",
+    image: require("../assets/relaxedfirhoodie.jpg"),
   },
   {
-    id: '6',
-    name: 'Slim Fit Trousers',
-    category: 'Trousers',
-    price: '$42.00',
-    icon: 'layers-outline' as const,
+    id: "6",
+    name: "Slim Fit Trousers",
+    category: "Trousers",
+    price: "$42.00",
+    image: require("../assets/slimfitrouser.jpg"),
   },
 ];
 
-const categories = [
-  'All',
-  'T-Shirts',
-  'Jackets',
-  'Jeans',
-  'Hoodies',
-];
+const categories = ["All", "T-Shirts", "Jackets", "Jeans", "Hoodies"];
+type ExploreScreenProps = {
+  onProductPress: (product: any) => void;
+};
 
-export default function ExploreScreen() {
+export default function ExploreScreen({ onProductPress }: ExploreScreenProps) {
   return (
     <SafeAreaView style={styles.safeArea}>
-
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.smallTitle}>
-            FIND YOUR STYLE
-          </Text>
+          <Text style={styles.smallTitle}>FIND YOUR STYLE</Text>
 
-          <Text style={styles.title}>
-            Explore
-          </Text>
+          <Text style={styles.title}>Explore</Text>
         </View>
 
         <Pressable style={styles.filterButton}>
@@ -116,9 +109,7 @@ export default function ExploreScreen() {
 
       {/* Categories */}
       <View style={styles.categorySection}>
-        <Text style={styles.sectionTitle}>
-          Categories
-        </Text>
+        <Text style={styles.sectionTitle}>Categories</Text>
 
         <FlatList
           horizontal
@@ -148,13 +139,9 @@ export default function ExploreScreen() {
 
       {/* Products */}
       <View style={styles.productsHeader}>
-        <Text style={styles.sectionTitle}>
-          All Products
-        </Text>
+        <Text style={styles.sectionTitle}>All Products</Text>
 
-        <Text style={styles.productCount}>
-          {products.length} items
-        </Text>
+        <Text style={styles.productCount}>{products.length} items</Text>
       </View>
 
       <FlatList
@@ -165,15 +152,16 @@ export default function ExploreScreen() {
         columnWrapperStyle={styles.productRow}
         contentContainerStyle={styles.productList}
         renderItem={({ item }) => (
-          <Pressable style={styles.productCard}>
-
-            {/* Product Image Placeholder */}
+          <Pressable
+            style={styles.productCard}
+            onPress={() => onProductPress(item)}
+          >
+            {/* Product Image */}
             <View style={styles.productImage}>
-
-              <Ionicons
-                name={item.icon}
-                size={65}
-                color={lightColors.primaryLight}
+              <Image
+                source={item.image}
+                style={styles.productImageStyle}
+                resizeMode="cover"
               />
 
               {/* Favorite */}
@@ -184,29 +172,19 @@ export default function ExploreScreen() {
                   color={lightColors.text}
                 />
               </Pressable>
-
             </View>
 
             {/* Product Info */}
-            <Text
-              style={styles.productName}
-              numberOfLines={1}
-            >
+            <Text style={styles.productName} numberOfLines={1}>
               {item.name}
             </Text>
 
-            <Text style={styles.productCategory}>
-              {item.category}
-            </Text>
+            <Text style={styles.productCategory}>{item.category}</Text>
 
-            <Text style={styles.productPrice}>
-              {item.price}
-            </Text>
-
+            <Text style={styles.productPrice}>{item.price}</Text>
           </Pressable>
         )}
       />
-
     </SafeAreaView>
   );
 }
@@ -220,16 +198,16 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: sizes.md,
     marginBottom: sizes.md,
   },
 
   smallTitle: {
     fontSize: sizes.fontXs,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 1,
     color: lightColors.primary,
   },
@@ -237,7 +215,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: sizes.xs,
     fontSize: sizes.fontXxl,
-    fontWeight: '800',
+    fontWeight: "800",
     color: lightColors.text,
   },
 
@@ -248,15 +226,15 @@ const styles = StyleSheet.create({
     backgroundColor: lightColors.cardBg,
     borderWidth: 1,
     borderColor: lightColors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   // Search
   searchContainer: {
     height: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: sizes.md,
     backgroundColor: lightColors.inputBg,
     borderRadius: sizes.radiusMd,
@@ -278,7 +256,7 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: sizes.fontLg,
-    fontWeight: '700',
+    fontWeight: "700",
     color: lightColors.text,
   },
 
@@ -303,7 +281,7 @@ const styles = StyleSheet.create({
 
   categoryText: {
     fontSize: sizes.fontSm,
-    fontWeight: '600',
+    fontWeight: "600",
     color: lightColors.mutedText,
   },
 
@@ -313,9 +291,9 @@ const styles = StyleSheet.create({
 
   // Products
   productsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: sizes.md,
   },
 
@@ -329,39 +307,43 @@ const styles = StyleSheet.create({
   },
 
   productRow: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     marginBottom: sizes.lg,
   },
 
   productCard: {
-    width: '48%',
+    width: "48%",
   },
 
   productImage: {
     height: 190,
     borderRadius: sizes.radiusMd,
     backgroundColor: lightColors.inputBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    overflow: "hidden",
   },
-
+  productImageStyle: {
+    width: "100%",
+    height: "100%",
+  },
   favoriteButton: {
-    position: 'absolute',
+    position: "absolute",
     top: sizes.sm,
     right: sizes.sm,
     width: 32,
     height: 32,
     borderRadius: sizes.radiusRound,
     backgroundColor: lightColors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   productName: {
     marginTop: sizes.sm,
     fontSize: sizes.fontMd,
-    fontWeight: '700',
+    fontWeight: "700",
     color: lightColors.text,
   },
 
@@ -374,7 +356,7 @@ const styles = StyleSheet.create({
   productPrice: {
     marginTop: sizes.xs,
     fontSize: sizes.fontMd,
-    fontWeight: '700',
+    fontWeight: "700",
     color: lightColors.primary,
   },
 });

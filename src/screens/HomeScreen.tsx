@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  Image,
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -149,10 +150,10 @@ export default function HomeScreen() {
           {/* Product 1 */}
           <Pressable style={styles.productCard}>
             <View style={styles.productImage}>
-              <Ionicons
-                name="shirt-outline"
-                size={70}
-                color={lightColors.primaryLight}
+              <Image
+                source={require("../assets/classic-tshirt.jpg")}
+                style={styles.productImageStyle}
+                resizeMode="cover"
               />
 
               <View style={styles.favoriteButton}>
@@ -180,10 +181,10 @@ export default function HomeScreen() {
           {/* Product 2 */}
           <Pressable style={styles.productCard}>
             <View style={styles.productImage}>
-              <Ionicons
-                name="shirt-outline"
-                size={70}
-                color={lightColors.secondary}
+              <Image
+                source={require("../assets/casualjacket.jpg")}
+                style={styles.productImageStyle}
+                resizeMode="cover"
               />
 
               <View style={styles.favoriteButton}>
@@ -368,6 +369,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    overflow: 'hidden',
+  },
+
+  productImageStyle: {
+    width: '100%',
+    height: '100%',
   },
 
   favoriteButton: {
