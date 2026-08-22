@@ -1,56 +1,73 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
+
+
+// ZOD VALIDATION SCHEMA
+const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Please enter a valid email"),
+
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters"),
+});
+type LoginFormData = z.infer<typeof loginSchema>;
 
 type LoginScreenProps = {
   onLogin: () => void;
 };
 
-export default function LoginScreen({ onLogin }: LoginScreenProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+export default function LoginScreen({
+  onLogin,
+}: LoginScreenProps) {
+
   const [showPassword, setShowPassword] = useState(false);
 
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  // REACT HOOK FORM
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleLogin = () => {
-    let valid = true;
+  const handleLogin = (data: LoginFormData) => {
 
-    // Reset previous errors
-    setEmailError("");
-    setPasswordError("");
-
-    // Email validation
-    if (email.trim() === "") {
-      setEmailError("Email is required");
-      valid = false;
-    } else if (!email.includes("@")) {
-      setEmailError("Please enter a valid email");
-      valid = false;
-    }
-
-    // Password validation
-    if (password.trim() === "") {
-      setPasswordError("Password is required");
-      valid = false;
-    } else if (password.length < 8) {
-      setPasswordError("Password must be at least 8 characters");
-      valid = false;
-    }
-
-    // Login only if everything is valid
-    if (valid) {
-      onLogin();
-    }
+    console.log("Email:", data.email);
+    console.log("Password:", data.password);
+    onLogin();
   };
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+
         {/* Logo / Brand */}
         <View style={styles.brandContainer}>
           <View style={styles.logoCircle}>
@@ -60,96 +77,161 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               color={lightColors.white}
             />
           </View>
-
-          <Text style={styles.brandName}>CLOTHX</Text>
+          <Text style={styles.brandName}>
+            CLOTHX
+          </Text>
         </View>
+
 
         {/* Heading */}
         <View style={styles.headingContainer}>
-          <Text style={styles.title}>Welcome Back</Text>
-
-          <Text style={styles.subtitle}>Login to continue shopping</Text>
+          <Text style={styles.title}>
+            Welcome Back
+          </Text>
+          <Text style={styles.subtitle}>
+            Login to continue shopping
+          </Text>
         </View>
 
-        {/* Email */}
+        {/* EMAIL */}
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
-
-          <View style={styles.inputWrapper}>
+          <Text style={styles.label}>
+            Email
+          </Text>
+          <View
+            style={[
+              styles.inputWrapper,
+              errors.email && styles.inputError,
+            ]}
+          >
             <Ionicons
               name="mail-outline"
               size={sizes.fontXl}
               color={lightColors.mutedText}
             />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              placeholderTextColor={lightColors.mutedText}
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                setEmailError("");
-              }}
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="email"
+              render={({
+                field: {
+                  onChange,
+                  onBlur,
+                  value,
+                },
+              }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your email"
+                  placeholderTextColor={
+                    lightColors.mutedText
+                  }
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="none"
+                />
+              )}
             />
           </View>
-
-          {emailError !== "" && (
-            <Text style={styles.errorText}>{emailError}</Text>
+          {/* Email Error */}
+          {errors.email && (
+            <Text style={styles.errorText}>
+              {errors.email.message}
+            </Text>
           )}
         </View>
 
-        {/* Password */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
 
-          <View style={styles.inputWrapper}>
+        {/* PASSWORD */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>
+            Password
+          </Text>
+          <View
+            style={[
+              styles.inputWrapper,
+              errors.password && styles.inputError,
+            ]}
+          >
             <Ionicons
               name="lock-closed-outline"
               size={sizes.fontXl}
               color={lightColors.mutedText}
             />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              placeholderTextColor={lightColors.mutedText}
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                setPasswordError("");
-              }}
-              secureTextEntry={!showPassword}
+            <Controller
+              control={control}
+              name="password"
+              render={({
+                field: {
+                  onChange,
+                  onBlur,
+                  value,
+                },
+              }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your password"
+                  placeholderTextColor={
+                    lightColors.mutedText
+                  }
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                />
+              )}
             />
 
-            <Pressable onPress={() => setShowPassword(!showPassword)}>
+            {/* Show / Hide Password */}
+            <Pressable
+              onPress={() =>
+                setShowPassword(!showPassword)
+              }
+            >
               <Ionicons
-                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                name={
+                  showPassword
+                    ? "eye-outline"
+                    : "eye-off-outline"
+                }
                 size={sizes.fontXl}
                 color={lightColors.mutedText}
               />
             </Pressable>
           </View>
 
-          {passwordError !== "" && (
-            <Text style={styles.errorText}>{passwordError}</Text>
+          {/* Password Error */}
+          {errors.password && (
+            <Text style={styles.errorText}>
+              {errors.password.message}
+            </Text>
           )}
         </View>
 
-        {/* Forgot Password */}
+
+        {/* FORGOT PASSWORD */}
         <Pressable
           style={styles.forgotButton}
-          onPress={() => console.log("Forgot Password")}
+          onPress={() =>
+            console.log("Forgot Password")
+          }
         >
-          <Text style={styles.forgotText}>Forgot Password?</Text>
+          <Text style={styles.forgotText}>
+            Forgot Password?
+          </Text>
         </Pressable>
 
-        {/* Login Button */}
-        <Pressable style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>LOGIN</Text>
 
+        {/* LOGIN BUTTON */}
+        <Pressable
+          style={styles.loginButton}
+          onPress={handleSubmit(handleLogin)}
+        >
+          <Text style={styles.loginButtonText}>
+            LOGIN
+          </Text>
           <Ionicons
             name="arrow-forward"
             size={sizes.fontLg}
@@ -157,12 +239,20 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           />
         </Pressable>
 
-        {/* Sign Up */}
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Don't have an account?</Text>
 
-          <Pressable onPress={() => console.log("Sign Up")}>
-            <Text style={styles.signupLink}>Sign Up</Text>
+        {/* SIGN UP */}
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>
+            Don't have an account?
+          </Text>
+          <Pressable
+            onPress={() =>
+              console.log("Sign Up")
+            }
+          >
+            <Text style={styles.signupLink}>
+              Sign Up
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -175,18 +265,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: lightColors.background,
   },
-
   container: {
     flex: 1,
     paddingHorizontal: sizes.lg,
     justifyContent: "center",
   },
-
   brandContainer: {
     alignItems: "center",
     marginBottom: sizes.xl,
   },
-
   logoCircle: {
     width: 64,
     height: 64,
@@ -196,41 +283,34 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: sizes.sm,
   },
-
   brandName: {
     fontSize: sizes.fontLg,
     fontWeight: "700",
     letterSpacing: 5,
     color: lightColors.text,
   },
-
   headingContainer: {
     marginBottom: sizes.lg,
   },
-
   title: {
     fontSize: sizes.fontXxl,
     fontWeight: "700",
     color: lightColors.text,
     marginBottom: sizes.xs,
   },
-
   subtitle: {
     fontSize: sizes.fontMd,
     color: lightColors.mutedText,
   },
-
   inputContainer: {
     marginBottom: sizes.md,
   },
-
   label: {
     fontSize: sizes.fontSm,
     fontWeight: "600",
     color: lightColors.text,
     marginBottom: sizes.xs,
   },
-
   inputWrapper: {
     height: 52,
     flexDirection: "row",
@@ -241,7 +321,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: lightColors.border,
   },
-
+  inputError: {
+    borderColor: lightColors.danger,
+  },
   input: {
     flex: 1,
     marginLeft: sizes.sm,
@@ -253,19 +335,16 @@ const styles = StyleSheet.create({
     fontSize: sizes.fontXs,
     color: lightColors.danger,
   },
-
   forgotButton: {
     alignSelf: "flex-end",
     marginTop: sizes.xs,
     marginBottom: sizes.lg,
   },
-
   forgotText: {
     fontSize: sizes.fontSm,
     fontWeight: "600",
     color: lightColors.primary,
   },
-
   loginButton: {
     height: 52,
     borderRadius: sizes.radiusMd,
@@ -275,25 +354,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: sizes.sm,
   },
-
   loginButtonText: {
     fontSize: sizes.fontMd,
     fontWeight: "700",
     color: lightColors.white,
     letterSpacing: 1,
   },
-
   signupContainer: {
     flexDirection: "row",
     justifyContent: "center",
     marginTop: sizes.lg,
   },
-
   signupText: {
     fontSize: sizes.fontSm,
     color: lightColors.mutedText,
   },
-
   signupLink: {
     marginLeft: sizes.xs,
     fontSize: sizes.fontSm,
