@@ -9,25 +9,18 @@ import {
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
+import type { RootStackParamList } from '../types/navigation';
 
-type ProductDetailsProps = {
-  product: {
-    id: string;
-    name: string;
-    category: string;
-    price: string;
-    image: any;
-  };
-  onBack: () => void;
-};
-
-export default function ProductDetailsScreen({
-  product,
-  onBack,
-}: ProductDetailsProps) {
+export default function ProductDetailsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'ProductDetails'>>();
+  const { product } = route.params;
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -39,7 +32,7 @@ export default function ProductDetailsScreen({
         <View style={styles.header}>
           <Pressable
             style={styles.backButton}
-            onPress={onBack}
+            onPress={() => navigation.goBack()}
           >
             <Ionicons
               name="arrow-back"

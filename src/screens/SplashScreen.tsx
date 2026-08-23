@@ -7,24 +7,22 @@ import {
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
+import type { RootStackParamList } from '../types/navigation';
 
-type SplashScreenProps = {
-  onFinish: () => void;
-};
-
-export default function SplashScreen({
-  onFinish,
-}: SplashScreenProps) {
+export default function SplashScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      onFinish();
+      navigation.replace('Login');
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [onFinish]);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>

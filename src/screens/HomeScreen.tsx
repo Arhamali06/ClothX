@@ -149,6 +149,7 @@ export default function HomeScreen() {
 
           {/* Product 1 */}
           <Pressable style={styles.productCard}>
+            
             <View style={styles.productImage}>
               <Image
                 source={require("../assets/classic-tshirt.jpg")}

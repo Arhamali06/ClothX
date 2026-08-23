@@ -7,41 +7,34 @@ import {
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
 import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
 
-type BottomNavProps = {
-  activeScreen: string;
-  onChangeScreen: (screen: string) => void;
-};
-
-export default function BottomNav({
-  activeScreen,
-  onChangeScreen,
-}: BottomNavProps) {
+export default function BottomNav({ state, navigation }: BottomTabBarProps) {
 
   const tabs = [
     {
-      name: 'home',
+      name: 'Home',
       label: 'Home',
       icon: 'home-outline' as const,
       activeIcon: 'home' as const,
     },
     {
-      name: 'explore',
+      name: 'Explore',
       label: 'Explore',
       icon: 'search-outline' as const,
       activeIcon: 'search' as const,
     },
     {
-      name: 'cart',
+      name: 'Cart',
       label: 'Cart',
       icon: 'bag-outline' as const,
       activeIcon: 'bag' as const,
     },
     {
-      name: 'profile',
+      name: 'Profile',
       label: 'Profile',
       icon: 'person-outline' as const,
       activeIcon: 'person' as const,
@@ -52,13 +45,13 @@ export default function BottomNav({
     <View style={styles.container}>
 
       {tabs.map((tab) => {
-        const isActive = activeScreen === tab.name;
+        const isActive = state.routeNames[state.index] === tab.name;
 
         return (
           <Pressable
             key={tab.name}
             style={styles.tab}
-            onPress={() => onChangeScreen(tab.name)}
+            onPress={() => navigation.navigate(tab.name)}
           >
             <Ionicons
               name={isActive ? tab.activeIcon : tab.icon}

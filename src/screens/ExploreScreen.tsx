@@ -10,11 +10,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
+import type { Product, RootStackParamList } from '../types/navigation';
 
-const products = [
+const products: Product[] = [
   {
     id: "1",
     name: "Classic NavyBlue T-Shirt",
@@ -60,11 +63,8 @@ const products = [
 ];
 
 const categories = ["All", "T-Shirts", "Jackets", "Jeans", "Hoodies"];
-type ExploreScreenProps = {
-  onProductPress: (product: any) => void;
-};
-
-export default function ExploreScreen({ onProductPress }: ExploreScreenProps) {
+export default function ExploreScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
@@ -154,7 +154,7 @@ export default function ExploreScreen({ onProductPress }: ExploreScreenProps) {
         renderItem={({ item }) => (
           <Pressable
             style={styles.productCard}
-            onPress={() => onProductPress(item)}
+            onPress={() => navigation.navigate('ProductDetails', { product: item })}
           >
             {/* Product Image */}
             <View style={styles.productImage}>

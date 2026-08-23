@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -15,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
+import type { RootStackParamList } from '../types/navigation';
 
 
 // ZOD VALIDATION SCHEMA
@@ -32,14 +35,8 @@ const loginSchema = z.object({
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
-type LoginScreenProps = {
-  onLogin: () => void;
-};
-
-
-export default function LoginScreen({
-  onLogin,
-}: LoginScreenProps) {
+export default function LoginScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -60,7 +57,7 @@ export default function LoginScreen({
 
     console.log("Email:", data.email);
     console.log("Password:", data.password);
-    onLogin();
+    navigation.replace('MainTabs');
   };
 
 

@@ -8,9 +8,12 @@ import {
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
+import type { RootStackParamList } from '../types/navigation';
 
 const menuItems = [
   {
@@ -39,12 +42,8 @@ const menuItems = [
   },
 ];
 
-type ProfileScreenProps = {
-  onLogout: () => void;
-};
-
-
-export default function ProfileScreen({onLogout,}:ProfileScreenProps) {
+export default function ProfileScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -134,14 +133,17 @@ export default function ProfileScreen({onLogout,}:ProfileScreenProps) {
         </View>
 
         {/* Logout */}
-        <Pressable style={styles.logoutButton}>
+        <Pressable
+          style={styles.logoutButton}
+          onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Login' }] })}
+        >
           <Ionicons
             name="log-out-outline"
             size={sizes.fontLg}
             color={lightColors.danger}
           />
 
-          <Text style={styles.logoutText} onPress={onLogout}>
+          <Text style={styles.logoutText}>
             Logout
           </Text>
         </Pressable>
