@@ -11,6 +11,7 @@ export type Product = {
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
+  Signup: undefined;
   MainTabs: undefined;
   ProductDetails: { product: Product };
 };

@@ -8,8 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -35,9 +34,12 @@ const loginSchema = z.object({
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export default function LoginScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+type Props = NativeStackScreenProps<
+  RootStackParamList,
+  'Login'
+>;
 
+export default function LoginScreen({navigation}:Props) {
   const [showPassword, setShowPassword] = useState(false);
 
   // REACT HOOK FORM
@@ -244,7 +246,7 @@ export default function LoginScreen() {
           </Text>
           <Pressable
             onPress={() =>
-              console.log("Sign Up")
+              navigation.navigate("Signup")
             }
           >
             <Text style={styles.signupLink}>

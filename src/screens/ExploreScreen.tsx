@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -62,9 +62,16 @@ const products: Product[] = [
   },
 ];
 
-const categories = ["All", "T-Shirts", "Jackets", "Jeans", "Hoodies"];
+const categories = ["All", "T-Shirts", "Jackets", "Jeans", "Hoodies", "Trousers"] as const;
+type Category = (typeof categories)[number];
+
 export default function ExploreScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [selectedCategory, setSelectedCategory] = useState<Category>('All');
+  const filteredProducts = selectedCategory === 'All'
+    ? products
+    : products.filter((product) => product.category === selectedCategory);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
@@ -117,17 +124,18 @@ export default function ExploreScreen() {
           keyExtractor={(item) => item}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoryList}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <Pressable
               style={[
                 styles.categoryButton,
-                index === 0 && styles.activeCategory,
+                selectedCategory === item && styles.activeCategory,
               ]}
+              onPress={() => setSelectedCategory(item)}
             >
               <Text
                 style={[
                   styles.categoryText,
-                  index === 0 && styles.activeCategoryText,
+                  selectedCategory === item && styles.activeCategoryText,
                 ]}
               >
                 {item}
@@ -139,13 +147,15 @@ export default function ExploreScreen() {
 
       {/* Products */}
       <View style={styles.productsHeader}>
-        <Text style={styles.sectionTitle}>All Products</Text>
+        <Text style={styles.sectionTitle}>
+          {selectedCategory === 'All' ? 'All Products' : selectedCategory}
+        </Text>
 
-        <Text style={styles.productCount}>{products.length} items</Text>
+        <Text style={styles.productCount}>{filteredProducts.length} items</Text>
       </View>
 
       <FlatList
-        data={products}
+        data={filteredProducts}
         keyExtractor={(item) => item.id}
         numColumns={2}
         showsVerticalScrollIndicator={false}

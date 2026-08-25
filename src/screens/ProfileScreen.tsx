@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  Image,
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -68,10 +69,9 @@ export default function ProfileScreen() {
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Ionicons
-              name="person"
-              size={38}
-              color={lightColors.white}
+            <Image
+              source={require('../assets/profilepic.jpeg')}
+              style={styles.avatarImage}
             />
           </View>
 
@@ -211,6 +211,12 @@ const styles = StyleSheet.create({
     backgroundColor: lightColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
 
   profileInfo: {
