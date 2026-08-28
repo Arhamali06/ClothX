@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
 import type { RootStackParamList } from '../types/navigation';
+import { useAuth } from '../context/AuthContext';
 
 const menuItems = [
   {
@@ -45,6 +46,27 @@ const menuItems = [
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { user } = useAuth();
+
+  const handleMenuPress = (item: (typeof menuItems)[0]) => {
+    switch (item.id) {
+      case '1':
+        navigation.navigate('Orders');
+        break;
+      case '2':
+        navigation.navigate('Favorites');
+        break;
+      case '3':
+        navigation.navigate('Addresses');
+        break;
+      case '4':
+        navigation.navigate('Settings');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -57,7 +79,12 @@ export default function ProfileScreen() {
             Profile
           </Text>
 
-          <Pressable style={styles.settingsButton}>
+          <Pressable
+            style={styles.settingsButton}
+            onPress={() => navigation.navigate('Settings')}
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+          >
             <Ionicons
               name="settings-outline"
               size={sizes.fontXl}
@@ -70,18 +97,18 @@ export default function ProfileScreen() {
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
             <Image
-              source={require('../assets/profilepic.jpeg')}
+              source={{ uri: user?.image }}
               style={styles.avatarImage}
             />
           </View>
 
           <View style={styles.profileInfo}>
             <Text style={styles.name}>
-              Arham Ali
+              {user?.username}
             </Text>
 
             <Text style={styles.email}>
-              arham@example.com
+              {user?.email}
             </Text>
           </View>
 
@@ -104,6 +131,9 @@ export default function ProfileScreen() {
             <Pressable
               key={item.id}
               style={styles.menuItem}
+              onPress={() => handleMenuPress(item)}
+              accessibilityRole="button"
+              accessibilityLabel={item.title}
             >
               <View style={styles.menuIcon}>
                 <Ionicons

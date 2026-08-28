@@ -5,10 +5,14 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  ActivityIndicator,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -16,16 +20,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
-import type { RootStackParamList } from '../types/navigation';
+import type { RootStackParamList } from "../types/navigation";
+import GoogleLogo from "../components/GoogleLogo";
 
+import { loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 // ZOD VALIDATION SCHEMA
 const loginSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "Email is required")
-    .email("Please enter a valid email"),
+  username: z.string().trim().min(1, "Username is required"),
 
   password: z
     .string()
@@ -34,13 +37,13 @@ const loginSchema = z.object({
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
-type Props = NativeStackScreenProps<
-  RootStackParamList,
-  'Login'
->;
+type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
-export default function LoginScreen({navigation}:Props) {
+export default function LoginScreen({ navigation }: Props) {
   const [showPassword, setShowPassword] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { setUser } = useAuth();
 
   // REACT HOOK FORM
   const {
@@ -50,211 +53,232 @@ export default function LoginScreen({navigation}:Props) {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
-  const handleLogin = (data: LoginFormData) => {
+  const handleLogin = async (data: LoginFormData) => {
+    try {
+      setLoading(true);
+      setApiError("");
 
-    console.log("Email:", data.email);
-    console.log("Password:", data.password);
-    navigation.replace('MainTabs');
+      const response = await loginUser(data.username, data.password);
+
+      console.log("Login successful:", response);
+      setUser(response);
+
+      navigation.replace("MainTabs");
+    } catch (error: any) {
+      console.log("Login error:", error);
+
+      setApiError(
+        error?.response?.data?.message || "Invalid username or password",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* ── Hero Header ── */}
+          <View style={styles.heroSection}>
+            {/* Decorative blobs */}
+            <View style={styles.blobTopRight} />
+            <View style={styles.blobBottomLeft} />
 
-        {/* Logo / Brand */}
-        <View style={styles.brandContainer}>
-          <View style={styles.logoCircle}>
-            <Ionicons
-              name="shirt-outline"
-              size={32}
-              color={lightColors.white}
-            />
+            {/* Logo */}
+            <View style={styles.logoWrapper}>
+              <View style={styles.logoInner}>
+                <Ionicons name="shirt-outline" size={30} color={lightColors.white} />
+              </View>
+            </View>
+
+            <Text style={styles.brandName}>CLOTHX</Text>
+            <Text style={styles.heroTagline}>Your style, delivered.</Text>
           </View>
-          <Text style={styles.brandName}>
-            CLOTHX
-          </Text>
-        </View>
 
+          {/* ── Form Card ── */}
+          <View style={styles.card}>
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>Login to continue shopping</Text>
 
-        {/* Heading */}
-        <View style={styles.headingContainer}>
-          <Text style={styles.title}>
-            Welcome Back
-          </Text>
-          <Text style={styles.subtitle}>
-            Login to continue shopping
-          </Text>
-        </View>
-
-        {/* EMAIL */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>
-            Email
-          </Text>
-          <View
-            style={[
-              styles.inputWrapper,
-              errors.email && styles.inputError,
-            ]}
-          >
-            <Ionicons
-              name="mail-outline"
-              size={sizes.fontXl}
-              color={lightColors.mutedText}
-            />
-
-            <Controller
-              control={control}
-              name="email"
-              render={({
-                field: {
-                  onChange,
-                  onBlur,
-                  value,
-                },
-              }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your email"
-                  placeholderTextColor={
-                    lightColors.mutedText
+            {/* USERNAME */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Username</Text>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  errors.username && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="person-outline"
+                  size={18}
+                  color={
+                    errors.username ? lightColors.danger : lightColors.mutedText
                   }
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  autoCapitalize="none"
                 />
+                <Controller
+                  control={control}
+                  name="username"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your username"
+                      placeholderTextColor={lightColors.mutedText}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      autoCapitalize="none"
+                    />
+                  )}
+                />
+              </View>
+              {/* Email Error */}
+              {errors.username && (
+                <Text style={styles.errorText}>{errors.username.message}</Text>
               )}
-            />
-          </View>
-          {/* Email Error */}
-          {errors.email && (
-            <Text style={styles.errorText}>
-              {errors.email.message}
-            </Text>
-          )}
-        </View>
+            </View>
 
-
-        {/* PASSWORD */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>
-            Password
-          </Text>
-          <View
-            style={[
-              styles.inputWrapper,
-              errors.password && styles.inputError,
-            ]}
-          >
-            <Ionicons
-              name="lock-closed-outline"
-              size={sizes.fontXl}
-              color={lightColors.mutedText}
-            />
-            <Controller
-              control={control}
-              name="password"
-              render={({
-                field: {
-                  onChange,
-                  onBlur,
-                  value,
-                },
-              }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your password"
-                  placeholderTextColor={
-                    lightColors.mutedText
+            {/* PASSWORD */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Password</Text>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  errors.password && styles.inputError,
+                ]}
+              >
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={18}
+                  color={
+                    errors.password ? lightColors.danger : lightColors.mutedText
                   }
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
                 />
-              )}
-            />
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your password"
+                      placeholderTextColor={lightColors.mutedText}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                    />
+                  )}
+                />
 
-            {/* Show / Hide Password */}
+                {/* Show / Hide Password */}
+                <Pressable
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                  hitSlop={8}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-outline" : "eye-off-outline"}
+                    size={18}
+                    color={lightColors.mutedText}
+                  />
+                </Pressable>
+              </View>
+
+              {/* Password Error */}
+              {errors.password && (
+                <Text style={styles.errorText}>{errors.password.message}</Text>
+              )}
+            </View>
+
+            {/* FORGOT PASSWORD */}
             <Pressable
-              onPress={() =>
-                setShowPassword(!showPassword)
-              }
+              style={styles.forgotButton}
+              onPress={() => console.log("Forgot Password")}
             >
-              <Ionicons
-                name={
-                  showPassword
-                    ? "eye-outline"
-                    : "eye-off-outline"
-                }
-                size={sizes.fontXl}
-                color={lightColors.mutedText}
-              />
+              <Text style={styles.forgotText}>Forgot Password?</Text>
             </Pressable>
+
+            {/* LOGIN BUTTON */}
+            <Pressable
+              style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+              onPress={handleSubmit(handleLogin)}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={lightColors.white} />
+              ) : (
+                <>
+                  <Text style={styles.loginButtonText}>LOGIN</Text>
+                  <Ionicons
+                    name="arrow-forward"
+                    size={18}
+                    color={lightColors.white}
+                  />
+                </>
+              )}
+            </Pressable>
+
+            {apiError !== "" && (
+              <View style={styles.apiErrorBox}>
+                <Ionicons name="alert-circle-outline" size={14} color={lightColors.danger} />
+                <Text style={styles.apiErrorText}>{apiError}</Text>
+              </View>
+            )}
+
+            {/* DIVIDER */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or continue with</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* SOCIAL LOGIN BUTTONS */}
+            <View style={styles.socialRow}>
+              <Pressable
+                style={styles.socialButton}
+                onPress={() => console.log("Continue with Google")}
+                accessibilityRole="button"
+                accessibilityLabel="Continue with Google"
+              >
+                <GoogleLogo size={sizes.fontLg} />
+                <Text style={styles.socialButtonText}>Google</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.socialButton}
+                onPress={() => console.log("Continue with Apple")}
+                accessibilityRole="button"
+                accessibilityLabel="Continue with Apple"
+              >
+                <Ionicons name="logo-apple" size={sizes.fontLg} color="#000000" />
+                <Text style={styles.socialButtonText}>Apple</Text>
+              </Pressable>
+            </View>
+
+            {/* SIGN UP */}
+            <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>Don't have an account?</Text>
+              <Pressable onPress={() => navigation.navigate("Signup")}>
+                <Text style={styles.signupLink}> Sign Up</Text>
+              </Pressable>
+            </View>
           </View>
-
-          {/* Password Error */}
-          {errors.password && (
-            <Text style={styles.errorText}>
-              {errors.password.message}
-            </Text>
-          )}
-        </View>
-
-
-        {/* FORGOT PASSWORD */}
-        <Pressable
-          style={styles.forgotButton}
-          onPress={() =>
-            console.log("Forgot Password")
-          }
-        >
-          <Text style={styles.forgotText}>
-            Forgot Password?
-          </Text>
-        </Pressable>
-
-
-        {/* LOGIN BUTTON */}
-        <Pressable
-          style={styles.loginButton}
-          onPress={handleSubmit(handleLogin)}
-        >
-          <Text style={styles.loginButtonText}>
-            LOGIN
-          </Text>
-          <Ionicons
-            name="arrow-forward"
-            size={sizes.fontLg}
-            color={lightColors.white}
-          />
-        </Pressable>
-
-
-        {/* SIGN UP */}
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>
-            Don't have an account?
-          </Text>
-          <Pressable
-            onPress={() =>
-              navigation.navigate("Signup")
-            }
-          >
-            <Text style={styles.signupLink}>
-              Sign Up
-            </Text>
-          </Pressable>
-        </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -262,116 +286,281 @@ export default function LoginScreen({navigation}:Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: lightColors.background,
+    backgroundColor: lightColors.primary,
   },
+
   container: {
     flex: 1,
-    paddingHorizontal: sizes.lg,
-    justifyContent: "center",
   },
-  brandContainer: {
-    alignItems: "center",
-    marginBottom: sizes.xl,
+
+  scrollContainer: {
+    flexGrow: 1,
   },
-  logoCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: sizes.radiusRound,
+
+  /* ── Hero ── */
+  heroSection: {
+    height: 230,
     backgroundColor: lightColors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    paddingBottom: sizes.xl,
+  },
+
+  blobTopRight: {
+    position: "absolute",
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: "rgba(255,255,255,0.10)",
+    top: -40,
+    right: -40,
+  },
+
+  blobBottomLeft: {
+    position: "absolute",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "rgba(255,255,255,0.07)",
+    bottom: 10,
+    left: -30,
+  },
+
+  logoWrapper: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: "rgba(255,255,255,0.20)",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: sizes.sm,
   },
+
+  logoInner: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   brandName: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    letterSpacing: 5,
-    color: lightColors.text,
+    fontSize: 22,
+    fontWeight: "800",
+    letterSpacing: 6,
+    color: lightColors.white,
+    marginBottom: 4,
   },
-  headingContainer: {
-    marginBottom: sizes.lg,
+
+  heroTagline: {
+    fontSize: sizes.fontSm,
+    color: "rgba(255,255,255,0.75)",
+    letterSpacing: 0.5,
   },
+
+  /* ── Card ── */
+  card: {
+    flex: 1,
+    backgroundColor: lightColors.background,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: sizes.lg,
+    paddingTop: sizes.xl,
+    paddingBottom: sizes.lg,
+    marginTop: -24,
+  },
+
   title: {
     fontSize: sizes.fontXxl,
-    fontWeight: "700",
+    fontWeight: "800",
     color: lightColors.text,
-    marginBottom: sizes.xs,
+    marginBottom: 4,
   },
+
   subtitle: {
-    fontSize: sizes.fontMd,
+    fontSize: sizes.fontSm,
     color: lightColors.mutedText,
+    marginBottom: sizes.xl,
+    lineHeight: 20,
   },
-  inputContainer: {
+
+  /* ── Fields ── */
+  fieldGroup: {
     marginBottom: sizes.md,
   },
+
   label: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
+    fontSize: sizes.fontXs,
+    fontWeight: "700",
     color: lightColors.text,
-    marginBottom: sizes.xs,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    marginBottom: 6,
   },
+
   inputWrapper: {
-    height: 52,
+    height: 54,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: sizes.md,
-    borderRadius: sizes.radiusMd,
+    borderRadius: sizes.radiusLg,
     backgroundColor: lightColors.inputBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
+    borderWidth: 1.5,
+    borderColor: "transparent",
   },
+
   inputError: {
     borderColor: lightColors.danger,
+    backgroundColor: "#FFF5F5",
   },
+
   input: {
     flex: 1,
-    marginLeft: sizes.sm,
+    marginLeft: 10,
+    paddingVertical: 0,
     fontSize: sizes.fontMd,
     color: lightColors.text,
   },
+
+  eyeButton: {
+    padding: sizes.xs,
+  },
+
   errorText: {
-    marginTop: sizes.xs,
+    marginTop: 5,
     fontSize: sizes.fontXs,
     color: lightColors.danger,
   },
+
+  /* ── Forgot ── */
   forgotButton: {
     alignSelf: "flex-end",
-    marginTop: sizes.xs,
     marginBottom: sizes.lg,
   },
+
   forgotText: {
     fontSize: sizes.fontSm,
     fontWeight: "600",
     color: lightColors.primary,
   },
+
+  /* ── Login Button ── */
   loginButton: {
-    height: 52,
-    borderRadius: sizes.radiusMd,
+    height: 56,
+    borderRadius: sizes.radiusRound,
     backgroundColor: lightColors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: sizes.sm,
+    shadowColor: lightColors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
+
+  loginButtonDisabled: {
+    opacity: 0.7,
+  },
+
   loginButtonText: {
     fontSize: sizes.fontMd,
-    fontWeight: "700",
+    fontWeight: "800",
     color: lightColors.white,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
+
+  /* ── API Error ── */
+  apiErrorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: sizes.sm,
+    paddingHorizontal: sizes.md,
+    paddingVertical: sizes.sm,
+    backgroundColor: "#FFF0EF",
+    borderRadius: sizes.radiusMd,
+    borderLeftWidth: 3,
+    borderLeftColor: lightColors.danger,
+  },
+
+  apiErrorText: {
+    flex: 1,
+    fontSize: sizes.fontXs,
+    color: lightColors.danger,
+  },
+
+  /* ── Divider ── */
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: sizes.lg,
+  },
+
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: lightColors.border,
+  },
+
+  dividerText: {
+    marginHorizontal: sizes.sm,
+    fontSize: sizes.fontXs,
+    fontWeight: "500",
+    color: lightColors.mutedText,
+    letterSpacing: 0.3,
+  },
+
+  /* ── Social ── */
+  socialRow: {
+    flexDirection: "row",
+    gap: sizes.sm,
+  },
+
+  socialButton: {
+    flex: 1,
+    height: 52,
+    borderRadius: sizes.radiusLg,
+    backgroundColor: lightColors.white,
+    borderWidth: 1.5,
+    borderColor: lightColors.border,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: sizes.sm,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+
+  socialButtonText: {
+    fontSize: sizes.fontSm,
+    fontWeight: "600",
+    color: lightColors.text,
+  },
+
+  /* ── Sign Up Link ── */
   signupContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     marginTop: sizes.lg,
+    paddingBottom: sizes.sm,
   },
+
   signupText: {
     fontSize: sizes.fontSm,
     color: lightColors.mutedText,
   },
+
   signupLink: {
-    marginLeft: sizes.xs,
     fontSize: sizes.fontSm,
-    fontWeight: "700",
+    fontWeight: "800",
     color: lightColors.primary,
   },
 });

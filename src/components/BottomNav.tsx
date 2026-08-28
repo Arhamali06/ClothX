@@ -11,8 +11,10 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
 import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
+import { useCart } from '../context/CartContext';
 
 export default function BottomNav({ state, navigation }: BottomTabBarProps) {
+  const { uniqueProductsCount } = useCart();
 
   const tabs = [
     {
@@ -46,6 +48,7 @@ export default function BottomNav({ state, navigation }: BottomTabBarProps) {
 
       {tabs.map((tab) => {
         const isActive = state.routeNames[state.index] === tab.name;
+        const isCart = tab.name === 'Cart';
 
         return (
           <Pressable
@@ -53,15 +56,22 @@ export default function BottomNav({ state, navigation }: BottomTabBarProps) {
             style={styles.tab}
             onPress={() => navigation.navigate(tab.name)}
           >
-            <Ionicons
-              name={isActive ? tab.activeIcon : tab.icon}
-              size={sizes.fontXl}
-              color={
-                isActive
-                  ? lightColors.primary
-                  : lightColors.mutedText
-              }
-            />
+            <View style={styles.iconWrapper}>
+              <Ionicons
+                name={isActive ? tab.activeIcon : tab.icon}
+                size={sizes.fontXl}
+                color={
+                  isActive
+                    ? lightColors.primary
+                    : lightColors.mutedText
+                }
+              />
+              {isCart && uniqueProductsCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{uniqueProductsCount}</Text>
+                </View>
+              )}
+            </View>
 
             <Text
               style={[
@@ -95,6 +105,31 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  iconWrapper: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: lightColors.primary,
+    borderRadius: sizes.radiusRound,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  badgeText: {
+    color: lightColors.white,
+    fontSize: 10,
+    fontWeight: '700',
   },
 
   label: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -16,43 +16,73 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
 import type { RootStackParamList } from '../types/navigation';
+import { useFavorites } from '../context/FavoritesContext';
+import { useCart } from '../context/CartContext';
 
 export default function ProductDetailsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'ProductDetails'>>();
   const { product } = route.params;
+
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { addToCart } = useCart();
+  const [selectedSize, setSelectedSize] = useState<string>('M');
+
+  const availableSizes = ['S', 'M', 'L', 'XL'];
+  const favorite = isFavorite(product.id);
+
+  const handleAddToCart = () => {
+    addToCart(product, 1, selectedSize);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+
+      {/* Fixed Header */}
+      <View style={styles.header}>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
+          <Ionicons
+            name="arrow-back"
+            size={sizes.fontXl}
+            color={lightColors.text}
+          />
+        </Pressable>
+
+        <Text style={styles.headerTitle}>
+          Product Details
+        </Text>
+
+        <Pressable
+          style={styles.favoriteButton}
+          onPress={() => toggleFavorite(product)}
+          accessibilityRole="button"
+          accessibilityLabel={
+            favorite
+              ? "Remove from favorites"
+              : "Add to favorites"
+          }
+        >
+          <Ionicons
+            name={favorite ? "heart" : "heart-outline"}
+            size={sizes.fontXl}
+            color={
+              favorite
+                ? lightColors.danger
+                : lightColors.text
+            }
+          />
+        </Pressable>
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
       >
-
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons
-              name="arrow-back"
-              size={sizes.fontXl}
-              color={lightColors.text}
-            />
-          </Pressable>
-
-          <Text style={styles.headerTitle}>
-            Product Details
-          </Text>
-
-          <Pressable style={styles.favoriteButton}>
-            <Ionicons
-              name="heart-outline"
-              size={sizes.fontXl}
-              color={lightColors.text}
-            />
-          </Pressable>
-        </View>
 
         {/* Product Image */}
         <View style={styles.imageContainer}>
@@ -134,25 +164,34 @@ export default function ProductDetailsScreen() {
           </Text>
 
           <View style={styles.sizeContainer}>
-            <Pressable style={styles.sizeButton}>
-              <Text style={styles.sizeText}>S</Text>
-            </Pressable>
-
-            <Pressable style={styles.sizeButton}>
-              <Text style={styles.sizeText}>M</Text>
-            </Pressable>
-
-            <Pressable style={styles.sizeButton}>
-              <Text style={styles.sizeText}>L</Text>
-            </Pressable>
-
-            <Pressable style={styles.sizeButton}>
-              <Text style={styles.sizeText}>XL</Text>
-            </Pressable>
+            {availableSizes.map((size) => (
+              <Pressable
+                key={size}
+                style={[
+                  styles.sizeButton,
+                  selectedSize === size && styles.sizeButtonActive,
+                ]}
+                onPress={() => setSelectedSize(size)}
+              >
+                <Text
+                  style={[
+                    styles.sizeText,
+                    selectedSize === size && styles.sizeTextActive,
+                  ]}
+                >
+                  {size}
+                </Text>
+              </Pressable>
+            ))}
           </View>
 
           {/* Add To Cart */}
-          <Pressable style={styles.cartButton}>
+          <Pressable
+            style={styles.cartButton}
+            onPress={handleAddToCart}
+            accessibilityRole="button"
+            accessibilityLabel="Add to cart"
+          >
             <Ionicons
               name="bag-add-outline"
               size={sizes.fontLg}
@@ -187,6 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: sizes.lg,
   },
 
   headerTitle: {
@@ -253,7 +293,7 @@ const styles = StyleSheet.create({
 
   price: {
     marginTop: sizes.sm,
-    fontSize: sizes.fontXl,
+    fontSize: sizes.fontXxl,
     fontWeight: '800',
     color: lightColors.primary,
   },
@@ -307,10 +347,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
+  sizeButtonActive: {
+    backgroundColor: lightColors.primary,
+    borderColor: lightColors.primary,
+  },
+
   sizeText: {
     fontSize: sizes.fontSm,
     fontWeight: '600',
     color: lightColors.text,
+  },
+
+  sizeTextActive: {
+    color: lightColors.white,
+    fontWeight: '700',
   },
 
   // Cart

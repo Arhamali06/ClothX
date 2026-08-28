@@ -13,6 +13,10 @@ export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
   MainTabs: undefined;
+  Favorites: undefined;
+  Orders: undefined;
+  Addresses: undefined;
+  Settings: undefined;
   ProductDetails: { product: Product };
 };
 

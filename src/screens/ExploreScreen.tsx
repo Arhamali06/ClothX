@@ -7,70 +7,53 @@ import {
   Pressable,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
-import type { Product, RootStackParamList } from '../types/navigation';
+import type { RootStackParamList } from "../types/navigation";
 
-const products: Product[] = [
-  {
-    id: "1",
-    name: "Classic NavyBlue T-Shirt",
-    category: "T-Shirts",
-    price: "$25.00",
-    image: require("../assets/classic-navyblue-shirt.webp"),
-  },
-  {
-    id: "2",
-    name: "Oversized White T-Shirt",
-    category: "T-Shirts",
-    price: "$28.00",
-    image: require("../assets/oversized-white.webp"),
-  },
-  {
-    id: "3",
-    name: "Casual Denim Jacket",
-    category: "Jackets",
-    price: "$55.00",
-    image: require("../assets/denimajcket.jpg"),
-  },
-  {
-    id: "4",
-    name: "Classic Blue Jeans",
-    category: "Jeans",
-    price: "$45.00",
-    image: require("../assets/bluejeans.jpg"),
-  },
-  {
-    id: "5",
-    name: "Relaxed Fit Hoodie",
-    category: "Hoodies",
-    price: "$40.00",
-    image: require("../assets/relaxedfirhoodie.jpg"),
-  },
-  {
-    id: "6",
-    name: "Slim Fit Trousers",
-    category: "Trousers",
-    price: "$42.00",
-    image: require("../assets/slimfitrouser.jpg"),
-  },
-];
-
-const categories = ["All", "T-Shirts", "Jackets", "Jeans", "Hoodies", "Trousers"] as const;
-type Category = (typeof categories)[number];
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { getProducts } from "../services/productService";
+import { useFavorites } from "../context/FavoritesContext";
+import { useCart } from "../context/CartContext";
+import ProductCard from "../components/ProductCard";
 
 export default function ExploreScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [selectedCategory, setSelectedCategory] = useState<Category>('All');
-  const filteredProducts = selectedCategory === 'All'
-    ? products
-    : products.filter((product) => product.category === selectedCategory);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { addToCart } = useCart();
+
+  // Fetch products from API
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["products", searchQuery],
+    queryFn: () => getProducts(searchQuery),
+    placeholderData: keepPreviousData,
+  });
+
+  // Create categories from API products
+  const categories = [
+    "All",
+    ...new Set(products.map((product) => product.category)),
+  ];
+
+  // Filter products according to selected category
+  const filteredProducts =
+    selectedCategory === "All"
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -103,6 +86,9 @@ export default function ExploreScreen() {
           style={styles.searchInput}
           placeholder="Search products..."
           placeholderTextColor={lightColors.mutedText}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoCapitalize="none"
         />
 
         <Pressable>
@@ -118,83 +104,96 @@ export default function ExploreScreen() {
       <View style={styles.categorySection}>
         <Text style={styles.sectionTitle}>Categories</Text>
 
-        <FlatList
-          horizontal
-          data={categories}
-          keyExtractor={(item) => item}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryList}
-          renderItem={({ item }) => (
-            <Pressable
-              style={[
-                styles.categoryButton,
-                selectedCategory === item && styles.activeCategory,
-              ]}
-              onPress={() => setSelectedCategory(item)}
-            >
-              <Text
+        {isLoading ? (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color={lightColors.primary} />
+            <Text style={styles.loadingText}>Loading products...</Text>
+          </View>
+        ) : isError ? (
+          <View style={styles.center}>
+            <Ionicons
+              name="alert-circle-outline"
+              size={50}
+              color={lightColors.primary}
+            />
+
+            <Text style={styles.errorText}>Failed to load products</Text>
+          </View>
+        ) : (
+          <FlatList
+            horizontal
+            data={categories}
+            keyExtractor={(item) => item}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryList}
+            renderItem={({ item }) => (
+              <Pressable
                 style={[
-                  styles.categoryText,
-                  selectedCategory === item && styles.activeCategoryText,
+                  styles.categoryButton,
+                  selectedCategory === item && styles.activeCategory,
                 ]}
+                onPress={() => setSelectedCategory(item)}
               >
-                {item}
-              </Text>
-            </Pressable>
-          )}
-        />
+                <Text
+                  style={[
+                    styles.categoryText,
+                    selectedCategory === item && styles.activeCategoryText,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </Pressable>
+            )}
+          />
+        )}
       </View>
 
       {/* Products */}
       <View style={styles.productsHeader}>
         <Text style={styles.sectionTitle}>
-          {selectedCategory === 'All' ? 'All Products' : selectedCategory}
+          {selectedCategory === "All" ? "All Products" : selectedCategory}
         </Text>
 
         <Text style={styles.productCount}>{filteredProducts.length} items</Text>
       </View>
 
-      <FlatList
-        data={filteredProducts}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        columnWrapperStyle={styles.productRow}
-        contentContainerStyle={styles.productList}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.productCard}
-            onPress={() => navigation.navigate('ProductDetails', { product: item })}
-          >
-            {/* Product Image */}
-            <View style={styles.productImage}>
-              <Image
-                source={item.image}
-                style={styles.productImageStyle}
-                resizeMode="cover"
-              />
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={lightColors.primary} />
+          <Text style={styles.loadingText}>Loading products...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.center}>
+          <Ionicons
+            name="alert-circle-outline"
+            size={50}
+            color={lightColors.primary}
+          />
 
-              {/* Favorite */}
-              <Pressable style={styles.favoriteButton}>
-                <Ionicons
-                  name="heart-outline"
-                  size={18}
-                  color={lightColors.text}
-                />
-              </Pressable>
-            </View>
-
-            {/* Product Info */}
-            <Text style={styles.productName} numberOfLines={1}>
-              {item.name}
-            </Text>
-
-            <Text style={styles.productCategory}>{item.category}</Text>
-
-            <Text style={styles.productPrice}>{item.price}</Text>
-          </Pressable>
-        )}
-      />
+          <Text style={styles.errorText}>Failed to load products</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          keyExtractor={(item) => String(item.id)}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          columnWrapperStyle={styles.productRow}
+          contentContainerStyle={styles.productList}
+          keyboardShouldPersistTaps="handled"
+          ListEmptyComponent={
+            <Text style={styles.noResultsText}>No products found</Text>
+          }
+          renderItem={({ item }) => (
+            <ProductCard
+              product={item}
+              isFavorite={isFavorite(item.id)}
+              onToggleFavorite={toggleFavorite}
+              onAddToCart={addToCart}
+            />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -321,52 +320,28 @@ const styles = StyleSheet.create({
     marginBottom: sizes.lg,
   },
 
-  productCard: {
-    width: "48%",
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  productImage: {
-    height: 190,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
-  },
-  productImageStyle: {
-    width: "100%",
-    height: "100%",
-  },
-  favoriteButton: {
-    position: "absolute",
-    top: sizes.sm,
-    right: sizes.sm,
-    width: 32,
-    height: 32,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.white,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  productName: {
-    marginTop: sizes.sm,
+  loadingText: {
+    marginTop: sizes.md,
     fontSize: sizes.fontMd,
-    fontWeight: "700",
     color: lightColors.text,
   },
 
-  productCategory: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
+  errorText: {
+    marginTop: sizes.md,
+    fontSize: sizes.fontMd,
+    color: lightColors.text,
   },
 
-  productPrice: {
-    marginTop: sizes.xs,
+  noResultsText: {
+    textAlign: "center",
+    marginTop: sizes.xl,
     fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.primary,
+    color: lightColors.mutedText,
   },
 });

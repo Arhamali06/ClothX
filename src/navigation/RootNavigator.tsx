@@ -6,6 +6,10 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import ProductDetailsScreen from "../screens/ProductDetailsScreen";
+import FavoritesScreen from "../screens/FavoritesScreen";
+import OrdersScreen from "../screens/OrdersScreen";
+import AddressesScreen from "../screens/AddressesScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 import SplashScreen from "../screens/SplashScreen";
 import type { RootStackParamList } from "../types/navigation";
 
@@ -22,6 +26,10 @@ export default function RootNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
+        <Stack.Screen name="Favorites" component={FavoritesScreen} />
+        <Stack.Screen name="Orders" component={OrdersScreen} />
+        <Stack.Screen name="Addresses" component={AddressesScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

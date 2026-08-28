@@ -81,7 +81,7 @@ export default function SignupScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -91,228 +91,193 @@ export default function SignupScreen({ navigation }: Props) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          {/* ── Hero Header ── */}
+          <View style={styles.heroSection}>
+            <View style={styles.blobTopRight} />
+            <View style={styles.blobBottomLeft} />
 
-          <View style={styles.brandContainer}>
-            <View style={styles.logoCircle}>
-              <Ionicons
-                name="shirt-outline"
-                size={32}
-                color={lightColors.white}
-              />
+            <View style={styles.logoWrapper}>
+              <View style={styles.logoInner}>
+                <Ionicons name="shirt-outline" size={30} color={lightColors.white} />
+              </View>
             </View>
 
             <Text style={styles.brandName}>CLOTHX</Text>
+            <Text style={styles.heroTagline}>Join the style revolution.</Text>
           </View>
 
-          <View style={styles.headingContainer}>
+          {/* ── Form Card ── */}
+          <View style={styles.card}>
             <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Sign up to start shopping with ClothX</Text>
 
-            <Text style={styles.subtitle}>
-              Sign up to start shopping with ClothX
-            </Text>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Full Name</Text>
-
-            <View
-              style={[styles.inputWrapper, errors.name && styles.inputError]}
-            >
-              <Ionicons
-                name="person-outline"
-                size={sizes.fontXl}
-                color={errors.name ? lightColors.danger : lightColors.mutedText}
-              />
-
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter your full name"
-                    placeholderTextColor={lightColors.mutedText}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                  />
-                )}
-              />
-            </View>
-
-            {errors.name && (
-              <Text style={styles.errorText}>{errors.name.message}</Text>
-            )}
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-
-            <View
-              style={[styles.inputWrapper, errors.email && styles.inputError]}
-            >
-              <Ionicons
-                name="mail-outline"
-                size={sizes.fontXl}
-                color={
-                  errors.email ? lightColors.danger : lightColors.mutedText
-                }
-              />
-
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter your email"
-                    placeholderTextColor={lightColors.mutedText}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                )}
-              />
-            </View>
-
-            {errors.email && (
-              <Text style={styles.errorText}>{errors.email.message}</Text>
-            )}
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                errors.password && styles.inputError,
-              ]}
-            >
-              <Ionicons
-                name="lock-closed-outline"
-                size={sizes.fontXl}
-                color={
-                  errors.password ? lightColors.danger : lightColors.mutedText
-                }
-              />
-
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Create a password"
-                    placeholderTextColor={lightColors.mutedText}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                )}
-              />
-
-              <Pressable
-                style={styles.eyeButton}
-                onPress={() => setShowPassword(!showPassword)}
-                hitSlop={8}
-              >
+            {/* FULL NAME */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Full Name</Text>
+              <View style={[styles.inputWrapper, errors.name && styles.inputError]}>
                 <Ionicons
-                  name={showPassword ? "eye-outline" : "eye-off-outline"}
-                  size={sizes.fontXl}
-                  color={lightColors.mutedText}
+                  name="person-outline"
+                  size={18}
+                  color={errors.name ? lightColors.danger : lightColors.mutedText}
                 />
-              </Pressable>
+                <Controller
+                  control={control}
+                  name="name"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your full name"
+                      placeholderTextColor={lightColors.mutedText}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      autoCapitalize="words"
+                      autoCorrect={false}
+                    />
+                  )}
+                />
+              </View>
+              {errors.name && (
+                <Text style={styles.errorText}>{errors.name.message}</Text>
+              )}
             </View>
 
-            {errors.password && (
-              <Text style={styles.errorText}>{errors.password.message}</Text>
-            )}
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirm Password</Text>
-
-            <View
-              style={[
-                styles.inputWrapper,
-                errors.confirmPassword && styles.inputError,
-              ]}
-            >
-              <Ionicons
-                name="shield-checkmark-outline"
-                size={sizes.fontXl}
-                color={
-                  errors.confirmPassword
-                    ? lightColors.danger
-                    : lightColors.mutedText
-                }
-              />
-
-              <Controller
-                control={control}
-                name="confirmPassword"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Confirm your password"
-                    placeholderTextColor={lightColors.mutedText}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry={!showConfirmPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                )}
-              />
-
-              <Pressable
-                style={styles.eyeButton}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                hitSlop={8}
-              >
+            {/* EMAIL */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Email</Text>
+              <View style={[styles.inputWrapper, errors.email && styles.inputError]}>
                 <Ionicons
-                  name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
-                  size={sizes.fontXl}
-                  color={lightColors.mutedText}
+                  name="mail-outline"
+                  size={18}
+                  color={errors.email ? lightColors.danger : lightColors.mutedText}
                 />
-              </Pressable>
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your email"
+                      placeholderTextColor={lightColors.mutedText}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  )}
+                />
+              </View>
+              {errors.email && (
+                <Text style={styles.errorText}>{errors.email.message}</Text>
+              )}
             </View>
 
+            {/* PASSWORD */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Password</Text>
+              <View style={[styles.inputWrapper, errors.password && styles.inputError]}>
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={18}
+                  color={errors.password ? lightColors.danger : lightColors.mutedText}
+                />
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Create a password"
+                      placeholderTextColor={lightColors.mutedText}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  )}
+                />
+                <Pressable
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                  hitSlop={8}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-outline" : "eye-off-outline"}
+                    size={18}
+                    color={lightColors.mutedText}
+                  />
+                </Pressable>
+              </View>
+              {errors.password && (
+                <Text style={styles.errorText}>{errors.password.message}</Text>
+              )}
+            </View>
 
-            {errors.confirmPassword && (
-              <Text style={styles.errorText}>
-                {errors.confirmPassword.message}
-              </Text>
-            )}
-          </View>
+            {/* CONFIRM PASSWORD */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <View style={[styles.inputWrapper, errors.confirmPassword && styles.inputError]}>
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={18}
+                  color={errors.confirmPassword ? lightColors.danger : lightColors.mutedText}
+                />
+                <Controller
+                  control={control}
+                  name="confirmPassword"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Confirm your password"
+                      placeholderTextColor={lightColors.mutedText}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      secureTextEntry={!showConfirmPassword}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  )}
+                />
+                <Pressable
+                  style={styles.eyeButton}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  hitSlop={8}
+                >
+                  <Ionicons
+                    name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                    size={18}
+                    color={lightColors.mutedText}
+                  />
+                </Pressable>
+              </View>
+              {errors.confirmPassword && (
+                <Text style={styles.errorText}>
+                  {errors.confirmPassword.message}
+                </Text>
+              )}
+            </View>
 
-          <Pressable
-            style={styles.signupButton}
-            onPress={handleSubmit(handleSignup)}
-          >
-            <Text style={styles.signupButtonText}>CREATE ACCOUNT</Text>
-
-            <Ionicons
-              name="arrow-forward"
-              size={sizes.fontLg}
-              color={lightColors.white}
-            />
-          </Pressable>
-
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>Already have an account?</Text>
-
-            <Pressable onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.loginLink}>Login</Text>
+            {/* CREATE ACCOUNT BUTTON */}
+            <Pressable
+              style={styles.signupButton}
+              onPress={handleSubmit(handleSignup)}
+            >
+              <Text style={styles.signupButtonText}>CREATE ACCOUNT</Text>
+              <Ionicons name="arrow-forward" size={18} color={lightColors.white} />
             </Pressable>
+
+            {/* LOGIN LINK */}
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Already have an account?</Text>
+              <Pressable onPress={() => navigation.navigate("Login")}>
+                <Text style={styles.loginLink}> Login</Text>
+              </Pressable>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -323,7 +288,7 @@ export default function SignupScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: lightColors.background,
+    backgroundColor: lightColors.primary,
   },
 
   container: {
@@ -332,59 +297,109 @@ const styles = StyleSheet.create({
 
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: sizes.lg,
-    paddingVertical: sizes.lg,
-    justifyContent: "center",
   },
 
-  brandContainer: {
-    alignItems: "center",
-    marginBottom: sizes.lg,
-  },
-
-  logoCircle: {
-    width: 62,
-    height: 62,
-    borderRadius: sizes.radiusRound,
+  /* ── Hero ── */
+  heroSection: {
+    height: 210,
     backgroundColor: lightColors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    paddingBottom: sizes.xl,
+  },
+
+  blobTopRight: {
+    position: "absolute",
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: "rgba(255,255,255,0.10)",
+    top: -40,
+    right: -40,
+  },
+
+  blobBottomLeft: {
+    position: "absolute",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "rgba(255,255,255,0.07)",
+    bottom: 10,
+    left: -30,
+  },
+
+  logoWrapper: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: "rgba(255,255,255,0.20)",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: sizes.sm,
   },
 
-  brandName: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    letterSpacing: 5,
-    color: lightColors.text,
+  logoInner: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
-  headingContainer: {
-    marginBottom: sizes.lg,
+  brandName: {
+    fontSize: 22,
+    fontWeight: "800",
+    letterSpacing: 6,
+    color: lightColors.white,
+    marginBottom: 4,
+  },
+
+  heroTagline: {
+    fontSize: sizes.fontSm,
+    color: "rgba(255,255,255,0.75)",
+    letterSpacing: 0.5,
+  },
+
+  /* ── Card ── */
+  card: {
+    flex: 1,
+    backgroundColor: lightColors.background,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: sizes.lg,
+    paddingTop: sizes.xl,
+    paddingBottom: sizes.lg,
+    marginTop: -24,
   },
 
   title: {
     fontSize: sizes.fontXxl,
-    fontWeight: "700",
+    fontWeight: "800",
     color: lightColors.text,
-    marginBottom: sizes.xs,
+    marginBottom: 4,
   },
 
   subtitle: {
-    fontSize: sizes.fontMd,
+    fontSize: sizes.fontSm,
     color: lightColors.mutedText,
-    lineHeight: 22,
+    marginBottom: sizes.xl,
+    lineHeight: 20,
   },
 
-  inputContainer: {
+  /* ── Fields ── */
+  fieldGroup: {
     marginBottom: sizes.md,
   },
 
   label: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
+    fontSize: sizes.fontXs,
+    fontWeight: "700",
     color: lightColors.text,
-    marginBottom: sizes.xs,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    marginBottom: 6,
   },
 
   inputWrapper: {
@@ -392,53 +407,60 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: sizes.md,
-    borderRadius: sizes.radiusMd,
+    borderRadius: sizes.radiusLg,
     backgroundColor: lightColors.inputBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
+    borderWidth: 1.5,
+    borderColor: "transparent",
   },
 
   inputError: {
     borderColor: lightColors.danger,
-    borderWidth: 1.5,
+    backgroundColor: "#FFF5F5",
   },
 
   input: {
     flex: 1,
-    marginLeft: sizes.sm,
+    marginLeft: 10,
     paddingVertical: 0,
     fontSize: sizes.fontMd,
     color: lightColors.text,
   },
 
   eyeButton: {
-    marginLeft: sizes.sm,
     padding: sizes.xs,
   },
 
   errorText: {
-    marginTop: sizes.xs,
+    marginTop: 5,
     fontSize: sizes.fontXs,
     color: lightColors.danger,
   },
+
+  /* ── Signup Button ── */
   signupButton: {
-    height: 54,
-    borderRadius: sizes.radiusMd,
+    height: 56,
+    borderRadius: sizes.radiusRound,
     backgroundColor: lightColors.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: sizes.sm,
     marginTop: sizes.sm,
+    shadowColor: lightColors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
 
   signupButtonText: {
     fontSize: sizes.fontMd,
-    fontWeight: "700",
+    fontWeight: "800",
     color: lightColors.white,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
 
+  /* ── Login Link ── */
   loginContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -453,9 +475,8 @@ const styles = StyleSheet.create({
   },
 
   loginLink: {
-    marginLeft: sizes.xs,
     fontSize: sizes.fontSm,
-    fontWeight: "700",
+    fontWeight: "800",
     color: lightColors.primary,
   },
 });
