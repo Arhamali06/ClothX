@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,11 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  Animated,
+  StatusBar,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -53,9 +56,42 @@ type SignupFormData = z.infer<typeof signupSchema>;
 type Props = NativeStackScreenProps<RootStackParamList, "Signup">;
 
 export default function SignupScreen({ navigation }: Props) {
-  
+  const insets = useSafeAreaInsets();
+  const heroExpandedHeight = 200 + insets.top;
+  const heroCompactHeight = 65 + insets.top;
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const heroHeight = useRef(new Animated.Value(heroExpandedHeight)).current;
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      setIsKeyboardOpen(true);
+      Animated.timing(heroHeight, {
+        toValue: heroCompactHeight,
+        duration: Platform.OS === "ios" ? e?.duration || 250 : 200,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, (e) => {
+      setIsKeyboardOpen(false);
+      Animated.timing(heroHeight, {
+        toValue: heroExpandedHeight,
+        duration: Platform.OS === "ios" ? e?.duration || 250 : 200,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [heroHeight, heroExpandedHeight, heroCompactHeight]);
 
   const {
     control,
@@ -81,30 +117,52 @@ export default function SignupScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <View style={styles.root}>
+      <StatusBar barStyle="light-content" backgroundColor={lightColors.primary} />
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContainer}
+          contentContainerStyle={[
+            styles.scrollContainer,
+            isKeyboardOpen && styles.scrollContainerKeyboard,
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          bounces={false}
         >
           {/* ── Hero Header ── */}
-          <View style={styles.heroSection}>
+          <Animated.View
+            style={[
+              styles.heroSection,
+              { height: heroHeight, paddingTop: insets.top },
+            ]}
+          >
             <View style={styles.blobTopRight} />
             <View style={styles.blobBottomLeft} />
 
-            <View style={styles.logoWrapper}>
-              <View style={styles.logoInner}>
-                <Ionicons name="shirt-outline" size={30} color={lightColors.white} />
+            {isKeyboardOpen ? (
+              <View style={styles.compactHeroRow}>
+                <View style={styles.compactLogoWrapper}>
+                  <Ionicons name="shirt-outline" size={20} color={lightColors.white} />
+                </View>
+                <Text style={styles.compactBrandName}>CLOTHX</Text>
               </View>
-            </View>
+            ) : (
+              <>
+                <View style={styles.logoWrapper}>
+                  <View style={styles.logoInner}>
+                    <Ionicons name="shirt-outline" size={30} color={lightColors.white} />
+                  </View>
+                </View>
 
-            <Text style={styles.brandName}>CLOTHX</Text>
-            <Text style={styles.heroTagline}>Join the style revolution.</Text>
-          </View>
+                <Text style={styles.brandName}>CLOTHX</Text>
+                <Text style={styles.heroTagline}>Join the style revolution.</Text>
+              </>
+            )}
+          </Animated.View>
 
           {/* ── Form Card ── */}
           <View style={styles.card}>
@@ -281,32 +339,61 @@ export default function SignupScreen({ navigation }: Props) {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  root: {
     flex: 1,
-    backgroundColor: lightColors.primary,
+    backgroundColor: lightColors.background,
   },
 
   container: {
     flex: 1,
+    backgroundColor: lightColors.background,
   },
 
   scrollContainer: {
     flexGrow: 1,
+    backgroundColor: lightColors.background,
+  },
+
+  scrollContainerKeyboard: {
+    paddingBottom: 40,
   },
 
   /* ── Hero ── */
   heroSection: {
-    height: 210,
     backgroundColor: lightColors.primary,
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
-    paddingBottom: sizes.xl,
+    paddingBottom: sizes.md,
+  },
+
+  compactHeroRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingTop: sizes.xs,
+  },
+
+  compactLogoWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  compactBrandName: {
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 4,
+    color: lightColors.white,
   },
 
   blobTopRight: {
