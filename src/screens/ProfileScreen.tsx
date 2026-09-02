@@ -112,7 +112,12 @@ export default function ProfileScreen() {
             </Text>
           </View>
 
-          <Pressable>
+          <Pressable
+            onPress={() => navigation.navigate('EditProfile')}
+            accessibilityRole="button"
+            accessibilityLabel="Edit profile"
+            hitSlop={8}
+          >
             <Ionicons
               name="create-outline"
               size={sizes.fontXl}

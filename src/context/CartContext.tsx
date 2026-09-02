@@ -1,5 +1,14 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+  useMemo,
+} from "react";
 import { Product } from "../types/products";
+import { getCarts } from "../services/cartServices";
 
 export interface CartItem {
   id: number;
@@ -10,6 +19,8 @@ export interface CartItem {
   quantity: number;
   selectedSize?: string;
   description?: string;
+  discountPercentage?: number;
+  discountedTotal?: number;
 }
 
 type ProductInput =
@@ -29,7 +40,16 @@ type ProductInput =
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: ProductInput, quantity?: number, selectedSize?: string) => void;
+  isLoading: boolean;
+  isRefreshing: boolean;
+  error: string | null;
+  fetchCartData: () => Promise<void>;
+  refreshCart: () => Promise<void>;
+  addToCart: (
+    product: ProductInput,
+    quantity?: number,
+    selectedSize?: string
+  ) => void;
   updateQuantity: (productId: number | string, newQuantity: number) => void;
   removeFromCart: (productId: number | string) => void;
   clearCart: () => void;
@@ -48,6 +68,68 @@ type CartProviderProps = {
 
 export function CartProvider({ children }: CartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCartData = useCallback(async () => {
+    try {
+      setError(null);
+      const data = await getCarts(1);
+      if (data.carts && data.carts.length > 0) {
+        const firstCart = data.carts[0];
+        const formattedItems: CartItem[] = firstCart.products.map((item) => ({
+          id: item.id,
+          title: item.title,
+          category: "Fashion & Lifestyle",
+          price: item.price,
+          thumbnail: item.thumbnail,
+          quantity: item.quantity,
+          selectedSize: "M",
+          discountPercentage: item.discountPercentage,
+          discountedTotal: item.discountedTotal,
+        }));
+        setCartItems(formattedItems);
+      }
+    } catch (err: any) {
+      console.error("Failed to fetch cart from API:", err);
+      setError(err?.message || "Failed to load cart items from server.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const refreshCart = useCallback(async () => {
+    setIsRefreshing(true);
+    setError(null);
+    try {
+      const data = await getCarts(1);
+      if (data.carts && data.carts.length > 0) {
+        const firstCart = data.carts[0];
+        const formattedItems: CartItem[] = firstCart.products.map((item) => ({
+          id: item.id,
+          title: item.title,
+          category: "Fashion & Lifestyle",
+          price: item.price,
+          thumbnail: item.thumbnail,
+          quantity: item.quantity,
+          selectedSize: "M",
+          discountPercentage: item.discountPercentage,
+          discountedTotal: item.discountedTotal,
+        }));
+        setCartItems(formattedItems);
+      }
+    } catch (err: any) {
+      console.error("Failed to refresh cart from API:", err);
+      setError(err?.message || "Failed to refresh cart items.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCartData();
+  }, [fetchCartData]);
 
   const normalizeProduct = (
     product: ProductInput,
@@ -170,6 +252,11 @@ export function CartProvider({ children }: CartProviderProps) {
     <CartContext.Provider
       value={{
         cartItems,
+        isLoading,
+        isRefreshing,
+        error,
+        fetchCartData,
+        refreshCart,
         addToCart,
         updateQuantity,
         removeFromCart,

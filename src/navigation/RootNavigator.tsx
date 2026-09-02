@@ -10,6 +10,7 @@ import FavoritesScreen from "../screens/FavoritesScreen";
 import OrdersScreen from "../screens/OrdersScreen";
 import AddressesScreen from "../screens/AddressesScreen";
 import SettingsScreen from "../screens/SettingsScreen";
+import EditProfileScreen from "../screens/EditProfileScreen";
 import SplashScreen from "../screens/SplashScreen";
 import type { RootStackParamList } from "../types/navigation";
 
@@ -30,6 +31,7 @@ export default function RootNavigator() {
         <Stack.Screen name="Orders" component={OrdersScreen} />
         <Stack.Screen name="Addresses" component={AddressesScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -8,6 +8,8 @@ import {
   Image,
   Animated,
   PanResponder,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -178,7 +180,16 @@ function SwipeableCartItem({
               {item.selectedSize ? ` • Size ${item.selectedSize}` : ""}
             </Text>
 
-            <Text style={styles.productPrice}>${itemTotal}</Text>
+            <View style={styles.priceRow}>
+              <Text style={styles.productPrice}>${itemTotal}</Text>
+              {item.discountPercentage ? (
+                <View style={styles.discountBadge}>
+                  <Text style={styles.discountText}>
+                    {item.discountPercentage}% OFF
+                  </Text>
+                </View>
+              ) : null}
+            </View>
 
             {/* Quantity */}
             <View style={styles.quantityContainer}>
@@ -240,6 +251,11 @@ export default function CartScreen() {
 
   const {
     cartItems,
+    isLoading,
+    isRefreshing,
+    error,
+    refreshCart,
+    fetchCartData,
     updateQuantity,
     removeFromCart,
     clearCart,
@@ -375,8 +391,16 @@ export default function CartScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.container,
-          cartItems.length === 0 && styles.emptyContainerStyle,
+          (cartItems.length === 0 || isLoading) && styles.emptyContainerStyle,
         ]}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refreshCart}
+            colors={[lightColors.primary]}
+            tintColor={lightColors.primary}
+          />
+        }
       >
         {/* Header */}
         <View style={styles.header}>
@@ -399,8 +423,34 @@ export default function CartScreen() {
           </View>
         </View>
 
-        {/* Cart Items or Empty State */}
-        {cartItems.length === 0 ? (
+        {/* Error Notification */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Ionicons
+              name="alert-circle-outline"
+              size={20}
+              color={lightColors.danger}
+            />
+            <Text style={styles.errorText}>{error}</Text>
+            <Pressable
+              style={styles.retryButton}
+              onPress={fetchCartData}
+              accessibilityRole="button"
+              accessibilityLabel="Retry loading cart"
+            >
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {/* Loading State */}
+        {isLoading && cartItems.length === 0 ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={lightColors.primary} />
+            <Text style={styles.loadingText}>Fetching your cart items...</Text>
+          </View>
+        ) : cartItems.length === 0 ? (
+          /* Empty State */
           <View style={styles.emptyState}>
             <View style={styles.emptyIconCircle}>
               <Ionicons
@@ -445,7 +495,7 @@ export default function CartScreen() {
 
             {/* Swipe hint */}
             <Text style={styles.swipeHintText}>
-              Swipe left on any item to delete
+              Swipe left on any item to delete • Pull down to refresh from API
             </Text>
 
             {/* Order Summary */}
@@ -647,6 +697,51 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
+  // Loading & Error States
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 80,
+  },
+
+  loadingText: {
+    marginTop: sizes.md,
+    fontSize: sizes.fontSm,
+    color: lightColors.mutedText,
+    fontWeight: "500",
+  },
+
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: `${lightColors.danger}15`,
+    padding: sizes.md,
+    borderRadius: sizes.radiusMd,
+    marginBottom: sizes.md,
+    gap: sizes.xs,
+  },
+
+  errorText: {
+    flex: 1,
+    fontSize: sizes.fontXs,
+    color: lightColors.danger,
+    fontWeight: "500",
+  },
+
+  retryButton: {
+    backgroundColor: lightColors.danger,
+    paddingHorizontal: sizes.sm + 2,
+    paddingVertical: sizes.xs,
+    borderRadius: sizes.radiusSm,
+  },
+
+  retryButtonText: {
+    color: lightColors.white,
+    fontSize: sizes.fontXs,
+    fontWeight: "700",
+  },
+
   // Cart List
   cartList: {
     gap: sizes.md,
@@ -733,11 +828,30 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
   },
 
-  productPrice: {
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: sizes.xs,
     marginTop: sizes.xs,
+  },
+
+  productPrice: {
     fontSize: sizes.fontMd,
     fontWeight: "700",
     color: lightColors.primary,
+  },
+
+  discountBadge: {
+    backgroundColor: `${lightColors.secondary}20`,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: sizes.radiusSm,
+  },
+
+  discountText: {
+    color: lightColors.secondary,
+    fontSize: 10,
+    fontWeight: "700",
   },
 
   // Quantity

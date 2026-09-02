@@ -7,11 +7,13 @@ type User = {
   firstName: string;
   lastName: string;
   image: string;
+  phone?: string;
 };
 
 type AuthContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
+  updateUser: (updates: Partial<User>) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,12 +24,18 @@ type AuthProviderProps = {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
+  const updateUser = (updates: Partial<User>) => {
+    setUser((currentUser) =>
+      currentUser ? { ...currentUser, ...updates } : currentUser,
+    );
+  };
 
   return (
     <AuthContext.Provider
       value={{
         user,
         setUser,
+        updateUser,
       }}
     >
       {children}
