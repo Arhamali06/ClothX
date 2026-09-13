@@ -12,19 +12,21 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import sizes from '../constants/sizes';
 import type { RootStackParamList } from '../types/navigation';
 import { useTheme, type ThemeColors } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function SplashScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { colors } = useTheme();
+  const { user } = useAuth();
   const styles = createStyles(colors);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login');
+      navigation.replace(user ? 'MainTabs' : 'Login');
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [navigation, user]);
 
   return (
     <View style={styles.container}>

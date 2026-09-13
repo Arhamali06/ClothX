@@ -47,10 +47,19 @@ const menuItems = [
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { colors, isDark, toggleTheme } = useTheme();
 
   const styles = createStyles(colors);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const handleMenuPress = (item: (typeof menuItems)[0]) => {
     switch (item.id) {
@@ -210,7 +219,7 @@ export default function ProfileScreen() {
         {/* Logout */}
         <Pressable
           style={styles.logoutButton}
-          onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Login' }] })}
+          onPress={handleLogout}
         >
           <Ionicons
             name="log-out-outline"

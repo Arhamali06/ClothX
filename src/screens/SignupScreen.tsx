@@ -11,6 +11,7 @@ import {
   Keyboard,
   Animated,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
 import { useTheme, type ThemeColors } from "../context/ThemeContext";
+import { signupUser } from "../services/authService";
 
 // ZOD VALIDATION SCHEMA
 const signupSchema = z
@@ -62,6 +64,9 @@ export default function SignupScreen({ navigation }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const heroHeight = useRef(new Animated.Value(heroExpandedHeight)).current;
   const { colors } = useTheme();
 
@@ -108,12 +113,29 @@ export default function SignupScreen({ navigation }: Props) {
     },
   });
 
-  const handleSignup = (data: SignupFormData) => {
-    console.log("Name:", data.name);
-    console.log("Email:", data.email);
-    console.log("Password:", data.password);
-    console.log("Confirm Password:", data.confirmPassword);
-    navigation.replace("Login");
+  const handleSignup = async (data: SignupFormData) => {
+    try {
+      setLoading(true);
+      setApiError("");
+      setSuccessMessage("");
+
+      const result = await signupUser(data.name, data.email, data.password);
+      const message = result.hasSession
+        ? "Account created successfully. Please sign in to continue."
+        : "Account created. Confirm your email, then sign in to continue.";
+
+      setSuccessMessage(message);
+      setTimeout(() => navigation.replace("Login"), 1800);
+    } catch (error: any) {
+      const message = String(error?.message || "");
+      setApiError(
+        message.toLowerCase().includes("rate limit")
+          ? "Supabase email limit reached. Disable email confirmation in Supabase Auth settings for testing, then wait for the limit to reset."
+          : message || "Unable to create your account",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const styles = createStyles(colors);
@@ -121,6 +143,23 @@ export default function SignupScreen({ navigation }: Props) {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      {(successMessage || apiError) && (
+        <View
+          style={[
+            styles.toast,
+            successMessage ? styles.successToast : styles.errorToast,
+          ]}
+        >
+          <Ionicons
+            name={successMessage ? "checkmark-circle" : "alert-circle"}
+            size={20}
+            color={successMessage ? colors.secondary : colors.danger}
+          />
+          <Text style={styles.toastText}>
+            {successMessage || apiError}
+          </Text>
+        </View>
+      )}
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -324,12 +363,26 @@ export default function SignupScreen({ navigation }: Props) {
 
             {/* CREATE ACCOUNT BUTTON */}
             <Pressable
-              style={styles.signupButton}
+              style={[styles.signupButton, loading && styles.signupButtonDisabled]}
               onPress={handleSubmit(handleSignup)}
+              disabled={loading}
             >
-              <Text style={styles.signupButtonText}>CREATE ACCOUNT</Text>
-              <Ionicons name="arrow-forward" size={18} color={colors.white} />
+              {loading ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <>
+                  <Text style={styles.signupButtonText}>CREATE ACCOUNT</Text>
+                  <Ionicons name="arrow-forward" size={18} color={colors.white} />
+                </>
+              )}
             </Pressable>
+
+            {apiError !== "" && (
+              <View style={styles.apiErrorBox}>
+                <Ionicons name="alert-circle-outline" size={14} color={colors.danger} />
+                <Text style={styles.apiErrorText}>{apiError}</Text>
+              </View>
+            )}
 
             {/* LOGIN LINK */}
             <View style={styles.loginContainer}>
@@ -350,6 +403,39 @@ const createStyles = (colors: ThemeColors) =>
     root: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+
+    toast: {
+      position: "absolute",
+      top: 52,
+      left: sizes.lg,
+      right: sizes.lg,
+      zIndex: 10,
+      elevation: 10,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.sm,
+      paddingHorizontal: sizes.md,
+      paddingVertical: sizes.md,
+      borderRadius: sizes.radiusMd,
+      borderWidth: 1,
+    },
+
+    successToast: {
+      backgroundColor: colors.cardBg,
+      borderColor: colors.secondary,
+    },
+
+    errorToast: {
+      backgroundColor: colors.cardBg,
+      borderColor: colors.danger,
+    },
+
+    toastText: {
+      flex: 1,
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.text,
     },
 
     container: {
@@ -548,6 +634,29 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: "800",
       color: colors.white,
       letterSpacing: 1.5,
+    },
+
+    signupButtonDisabled: {
+      opacity: 0.7,
+    },
+
+    apiErrorBox: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: sizes.sm,
+      paddingHorizontal: sizes.md,
+      paddingVertical: sizes.sm,
+      backgroundColor: `${colors.danger}18`,
+      borderRadius: sizes.radiusMd,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.danger,
+    },
+
+    apiErrorText: {
+      flex: 1,
+      fontSize: sizes.fontXs,
+      color: colors.danger,
     },
 
     /* ── Login Link ── */

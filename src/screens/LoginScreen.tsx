@@ -31,7 +31,11 @@ import { useTheme, type ThemeColors } from "../context/ThemeContext";
 
 // ZOD VALIDATION SCHEMA
 const loginSchema = z.object({
-  username: z.string().trim().min(1, "Username is required"),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Please enter a valid email"),
 
   password: z
     .string()
@@ -91,7 +95,7 @@ export default function LoginScreen({ navigation }: Props) {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -101,7 +105,7 @@ export default function LoginScreen({ navigation }: Props) {
       setLoading(true);
       setApiError("");
 
-      const response = await loginUser(data.username, data.password);
+      const response = await loginUser(data.email, data.password);
 
       console.log("Login successful:", response);
       setUser(response);
@@ -111,7 +115,7 @@ export default function LoginScreen({ navigation }: Props) {
       console.log("Login error:", error);
 
       setApiError(
-        error?.response?.data?.message || "Invalid username or password",
+        error?.message || "Invalid email or password",
       );
     } finally {
       setLoading(false);
@@ -175,41 +179,43 @@ export default function LoginScreen({ navigation }: Props) {
             <Text style={styles.title}>Welcome Back</Text>
             <Text style={styles.subtitle}>Login to continue shopping</Text>
 
-            {/* USERNAME */}
+            {/* EMAIL */}
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Username</Text>
+              <Text style={styles.label}>Email</Text>
               <View
                 style={[
                   styles.inputWrapper,
-                  errors.username && styles.inputError,
+                  errors.email && styles.inputError,
                 ]}
               >
                 <Ionicons
-                  name="person-outline"
+                  name="mail-outline"
                   size={18}
                   color={
-                    errors.username ? colors.danger : colors.mutedText
+                    errors.email ? colors.danger : colors.mutedText
                   }
                 />
                 <Controller
                   control={control}
-                  name="username"
+                  name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                       style={styles.input}
-                      placeholder="Enter your username"
+                      placeholder="Enter your email"
                       placeholderTextColor={colors.mutedText}
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
                       autoCapitalize="none"
+                      keyboardType="email-address"
+                      autoCorrect={false}
                     />
                   )}
                 />
               </View>
               {/* Email Error */}
-              {errors.username && (
-                <Text style={styles.errorText}>{errors.username.message}</Text>
+              {errors.email && (
+                <Text style={styles.errorText}>{errors.email.message}</Text>
               )}
             </View>
 
