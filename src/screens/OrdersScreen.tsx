@@ -12,16 +12,17 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
 import { useOrders, Order } from "../context/OrdersContext";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 
 export default function OrdersScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { orders } = useOrders();
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
+  const { colors } = useTheme();
 
   const filters = ["All", "Processing", "Delivered", "Cancelled"];
 
@@ -33,16 +34,18 @@ export default function OrdersScreen() {
   const getStatusColor = (status: Order["status"]) => {
     switch (status) {
       case "Delivered":
-        return lightColors.secondary;
+        return colors.secondary;
       case "Processing":
       case "Shipped":
-        return lightColors.accent;
+        return colors.accent;
       case "Cancelled":
-        return lightColors.danger;
+        return colors.danger;
       default:
-        return lightColors.mutedText;
+        return colors.mutedText;
     }
   };
+
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -57,7 +60,7 @@ export default function OrdersScreen() {
           <Ionicons
             name="arrow-back"
             size={sizes.fontXl}
-            color={lightColors.text}
+            color={colors.text}
           />
         </Pressable>
 
@@ -109,7 +112,7 @@ export default function OrdersScreen() {
               <Ionicons
                 name="receipt-outline"
                 size={54}
-                color={lightColors.primary}
+                color={colors.primary}
               />
             </View>
             <Text style={styles.emptyTitle}>No Orders Found</Text>
@@ -126,7 +129,7 @@ export default function OrdersScreen() {
               <Ionicons
                 name="arrow-forward"
                 size={sizes.fontMd}
-                color={lightColors.white}
+                color={colors.white}
               />
             </Pressable>
           </View>
@@ -173,7 +176,7 @@ export default function OrdersScreen() {
                         <Ionicons
                           name="image-outline"
                           size={24}
-                          color={lightColors.mutedText}
+                          color={colors.mutedText}
                         />
                       )}
                     </View>
@@ -218,261 +221,262 @@ export default function OrdersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  header: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: sizes.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: lightColors.border,
-  },
+    header: {
+      height: 60,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: sizes.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    backButton: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  headerTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    headerTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  placeholder: {
-    width: 42,
-  },
+    placeholder: {
+      width: 42,
+    },
 
-  filterContainer: {
-    paddingVertical: sizes.sm,
-    backgroundColor: lightColors.background,
-  },
+    filterContainer: {
+      paddingVertical: sizes.sm,
+      backgroundColor: colors.background,
+    },
 
-  filterList: {
-    paddingHorizontal: sizes.lg,
-    gap: sizes.sm,
-  },
+    filterList: {
+      paddingHorizontal: sizes.lg,
+      gap: sizes.sm,
+    },
 
-  filterChip: {
-    paddingVertical: sizes.xs + 2,
-    paddingHorizontal: sizes.md,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-  },
+    filterChip: {
+      paddingVertical: sizes.xs + 2,
+      paddingHorizontal: sizes.md,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  filterChipActive: {
-    backgroundColor: lightColors.primary,
-    borderColor: lightColors.primary,
-  },
+    filterChipActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
 
-  filterChipText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.mutedText,
-  },
+    filterChipText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.mutedText,
+    },
 
-  filterChipTextActive: {
-    color: lightColors.white,
-  },
+    filterChipTextActive: {
+      color: colors.white,
+    },
 
-  contentContainer: {
-    padding: sizes.lg,
-    paddingBottom: sizes.xl,
-    gap: sizes.md,
-  },
+    contentContainer: {
+      padding: sizes.lg,
+      paddingBottom: sizes.xl,
+      gap: sizes.md,
+    },
 
-  orderCard: {
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    padding: sizes.md,
-  },
+    orderCard: {
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: sizes.md,
+    },
 
-  orderHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+    orderHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
 
-  orderNumber: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    orderNumber: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  orderDate: {
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    marginTop: 2,
-  },
+    orderDate: {
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      marginTop: 2,
+    },
 
-  statusBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: sizes.sm + 2,
-    borderRadius: sizes.radiusRound,
-  },
+    statusBadge: {
+      paddingVertical: 4,
+      paddingHorizontal: sizes.sm + 2,
+      borderRadius: sizes.radiusRound,
+    },
 
-  statusText: {
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-  },
+    statusText: {
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+    },
 
-  divider: {
-    height: 1,
-    backgroundColor: lightColors.border,
-    marginVertical: sizes.sm,
-  },
+    divider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: sizes.sm,
+    },
 
-  itemsPreviewRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.sm,
-  },
+    itemsPreviewRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.sm,
+    },
 
-  itemImageContainer: {
-    width: 54,
-    height: 54,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
+    itemImageContainer: {
+      width: 54,
+      height: 54,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+    },
 
-  itemImage: {
-    width: "100%",
-    height: "100%",
-  },
+    itemImage: {
+      width: "100%",
+      height: "100%",
+    },
 
-  moreItemsBadge: {
-    width: 54,
-    height: 54,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: lightColors.border,
-  },
+    moreItemsBadge: {
+      width: 54,
+      height: 54,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  moreItemsText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "700",
-    color: lightColors.primary,
-  },
+    moreItemsText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "700",
+      color: colors.primary,
+    },
 
-  orderSummaryTextContainer: {
-    flex: 1,
-    marginLeft: sizes.sm,
-  },
+    orderSummaryTextContainer: {
+      flex: 1,
+      marginLeft: sizes.sm,
+    },
 
-  itemsCountText: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-  },
+    itemsCountText: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+    },
 
-  totalPriceText: {
-    fontSize: sizes.fontMd,
-    fontWeight: "800",
-    color: lightColors.primary,
-    marginTop: 2,
-  },
+    totalPriceText: {
+      fontSize: sizes.fontMd,
+      fontWeight: "800",
+      color: colors.primary,
+      marginTop: 2,
+    },
 
-  actionsRow: {
-    flexDirection: "row",
-    gap: sizes.sm,
-    marginTop: sizes.xs,
-  },
+    actionsRow: {
+      flexDirection: "row",
+      gap: sizes.sm,
+      marginTop: sizes.xs,
+    },
 
-  detailsButton: {
-    flex: 1,
-    height: 40,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    detailsButton: {
+      flex: 1,
+      height: 40,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  detailsButtonText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.text,
-  },
+    detailsButtonText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.text,
+    },
 
-  trackButton: {
-    flex: 1,
-    height: 40,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    trackButton: {
+      flex: 1,
+      height: 40,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  trackButtonText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "700",
-    color: lightColors.white,
-  },
+    trackButtonText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "700",
+      color: colors.white,
+    },
 
-  emptyContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-  },
+    emptyContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 60,
+    },
 
-  emptyIconCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: sizes.md,
-  },
+    emptyIconCircle: {
+      width: 90,
+      height: 90,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: sizes.md,
+    },
 
-  emptyTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "800",
-    color: lightColors.text,
-    marginBottom: sizes.xs,
-  },
+    emptyTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "800",
+      color: colors.text,
+      marginBottom: sizes.xs,
+    },
 
-  emptySubtitle: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-    textAlign: "center",
-    maxWidth: 240,
-    marginBottom: sizes.lg,
-  },
+    emptySubtitle: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+      textAlign: "center",
+      maxWidth: 240,
+      marginBottom: sizes.lg,
+    },
 
-  shopNowButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.xs,
-    backgroundColor: lightColors.primary,
-    paddingVertical: sizes.sm + 2,
-    paddingHorizontal: sizes.lg,
-    borderRadius: sizes.radiusMd,
-  },
+    shopNowButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.xs,
+      backgroundColor: colors.primary,
+      paddingVertical: sizes.sm + 2,
+      paddingHorizontal: sizes.lg,
+      borderRadius: sizes.radiusMd,
+    },
 
-  shopNowButtonText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "700",
-    color: lightColors.white,
-  },
-});
+    shopNowButtonText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "700",
+      color: colors.white,
+    },
+  });

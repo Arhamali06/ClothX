@@ -12,9 +12,9 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 
 export default function SettingsScreen() {
   const navigation =
@@ -23,6 +23,10 @@ export default function SettingsScreen() {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(false);
   const [orderTrackingAlerts, setOrderTrackingAlerts] = useState(true);
+
+  const { colors } = useTheme();
+
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -37,7 +41,7 @@ export default function SettingsScreen() {
           <Ionicons
             name="arrow-back"
             size={sizes.fontXl}
-            color={lightColors.text}
+            color={colors.text}
           />
         </Pressable>
 
@@ -64,11 +68,11 @@ export default function SettingsScreen() {
               value={pushNotifications}
               onValueChange={setPushNotifications}
               trackColor={{
-                false: lightColors.border,
-                true: lightColors.primaryLight,
+                false: colors.border,
+                true: colors.primaryLight,
               }}
               thumbColor={
-                pushNotifications ? lightColors.primary : lightColors.white
+                pushNotifications ? colors.primary : colors.white
               }
             />
           </View>
@@ -86,11 +90,11 @@ export default function SettingsScreen() {
               value={orderTrackingAlerts}
               onValueChange={setOrderTrackingAlerts}
               trackColor={{
-                false: lightColors.border,
-                true: lightColors.primaryLight,
+                false: colors.border,
+                true: colors.primaryLight,
               }}
               thumbColor={
-                orderTrackingAlerts ? lightColors.primary : lightColors.white
+                orderTrackingAlerts ? colors.primary : colors.white
               }
             />
           </View>
@@ -108,11 +112,11 @@ export default function SettingsScreen() {
               value={emailUpdates}
               onValueChange={setEmailUpdates}
               trackColor={{
-                false: lightColors.border,
-                true: lightColors.primaryLight,
+                false: colors.border,
+                true: colors.primaryLight,
               }}
               thumbColor={
-                emailUpdates ? lightColors.primary : lightColors.white
+                emailUpdates ? colors.primary : colors.white
               }
             />
           </View>
@@ -126,7 +130,7 @@ export default function SettingsScreen() {
               <Ionicons
                 name="globe-outline"
                 size={20}
-                color={lightColors.primary}
+                color={colors.primary}
               />
             </View>
             <View style={styles.rowInfo}>
@@ -136,7 +140,7 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-forward"
               size={18}
-              color={lightColors.mutedText}
+              color={colors.mutedText}
             />
           </Pressable>
 
@@ -147,7 +151,7 @@ export default function SettingsScreen() {
               <Ionicons
                 name="cash-outline"
                 size={20}
-                color={lightColors.primary}
+                color={colors.primary}
               />
             </View>
             <View style={styles.rowInfo}>
@@ -157,7 +161,7 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-forward"
               size={18}
-              color={lightColors.mutedText}
+              color={colors.mutedText}
             />
           </Pressable>
         </View>
@@ -170,7 +174,7 @@ export default function SettingsScreen() {
               <Ionicons
                 name="lock-closed-outline"
                 size={20}
-                color={lightColors.primary}
+                color={colors.primary}
               />
             </View>
             <View style={styles.rowInfo}>
@@ -180,7 +184,7 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-forward"
               size={18}
-              color={lightColors.mutedText}
+              color={colors.mutedText}
             />
           </Pressable>
 
@@ -191,7 +195,7 @@ export default function SettingsScreen() {
               <Ionicons
                 name="help-circle-outline"
                 size={20}
-                color={lightColors.primary}
+                color={colors.primary}
               />
             </View>
             <View style={styles.rowInfo}>
@@ -201,7 +205,7 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-forward"
               size={18}
-              color={lightColors.mutedText}
+              color={colors.mutedText}
             />
           </Pressable>
 
@@ -212,7 +216,7 @@ export default function SettingsScreen() {
               <Ionicons
                 name="document-text-outline"
                 size={20}
-                color={lightColors.primary}
+                color={colors.primary}
               />
             </View>
             <View style={styles.rowInfo}>
@@ -222,7 +226,7 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-forward"
               size={18}
-              color={lightColors.mutedText}
+              color={colors.mutedText}
             />
           </Pressable>
         </View>
@@ -233,116 +237,117 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  header: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: sizes.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: lightColors.border,
-  },
+    header: {
+      height: 60,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: sizes.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    backButton: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  headerTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    headerTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  placeholder: {
-    width: 42,
-  },
+    placeholder: {
+      width: 42,
+    },
 
-  contentContainer: {
-    padding: sizes.lg,
-    paddingBottom: sizes.xl,
-  },
+    contentContainer: {
+      padding: sizes.lg,
+      paddingBottom: sizes.xl,
+    },
 
-  sectionHeader: {
-    fontSize: sizes.fontSm,
-    fontWeight: "700",
-    color: lightColors.mutedText,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginTop: sizes.md,
-    marginBottom: sizes.sm,
-  },
+    sectionHeader: {
+      fontSize: sizes.fontSm,
+      fontWeight: "700",
+      color: colors.mutedText,
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+      marginTop: sizes.md,
+      marginBottom: sizes.sm,
+    },
 
-  card: {
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    paddingHorizontal: sizes.md,
-    marginBottom: sizes.md,
-  },
+    card: {
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: sizes.md,
+      marginBottom: sizes.md,
+    },
 
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: sizes.md,
-  },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: sizes.md,
+    },
 
-  interactiveRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: sizes.md,
-  },
+    interactiveRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: sizes.md,
+    },
 
-  rowIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: sizes.sm,
-  },
+    rowIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: sizes.sm,
+    },
 
-  rowInfo: {
-    flex: 1,
-  },
+    rowInfo: {
+      flex: 1,
+    },
 
-  rowTitle: {
-    fontSize: sizes.fontMd,
-    fontWeight: "600",
-    color: lightColors.text,
-  },
+    rowTitle: {
+      fontSize: sizes.fontMd,
+      fontWeight: "600",
+      color: colors.text,
+    },
 
-  rowSubtitle: {
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    marginTop: 2,
-  },
+    rowSubtitle: {
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      marginTop: 2,
+    },
 
-  divider: {
-    height: 1,
-    backgroundColor: lightColors.border,
-  },
+    divider: {
+      height: 1,
+      backgroundColor: colors.border,
+    },
 
-  appVersionText: {
-    textAlign: "center",
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    marginTop: sizes.lg,
-    marginBottom: sizes.xl,
-  },
-});
+    appVersionText: {
+      textAlign: "center",
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      marginTop: sizes.lg,
+      marginBottom: sizes.xl,
+    },
+  });

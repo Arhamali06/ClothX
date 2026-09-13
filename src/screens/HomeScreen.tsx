@@ -16,7 +16,6 @@ import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import type {
   BottomTabParamList,
@@ -29,6 +28,7 @@ import { getProducts } from "../services/productService";
 import { useAuth } from "../context/AuthContext";
 import { useFavorites } from "../context/FavoritesContext";
 import { useCart } from "../context/CartContext";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 import ProductCard from "../components/ProductCard";
 
 export default function HomeScreen() {
@@ -41,9 +41,10 @@ export default function HomeScreen() {
     >();
 
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { favorites, isFavorite, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { colors, isDark } = useTheme();
 
   // Fetch products from API
   const {
@@ -66,6 +67,8 @@ export default function HomeScreen() {
     selectedCategory === "All"
       ? products
       : products.filter((product) => product.category === selectedCategory);
+
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -94,8 +97,13 @@ export default function HomeScreen() {
           <Ionicons
             name="heart-outline"
             size={sizes.fontXl}
-            color={lightColors.text}
+            color={colors.text}
           />
+          {favorites.length > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{favorites.length}</Text>
+            </View>
+          )}
         </Pressable>
       </View>
 
@@ -119,7 +127,7 @@ export default function HomeScreen() {
               <Ionicons
                 name="arrow-forward"
                 size={sizes.fontMd}
-                color={lightColors.white}
+                color={isDark ? colors.background : colors.white}
               />
             </Pressable>
           </View>
@@ -127,7 +135,7 @@ export default function HomeScreen() {
           <Ionicons
             name="shirt-outline"
             size={100}
-            color={lightColors.primaryLight}
+            color={colors.primaryLight}
           />
         </View>
 
@@ -141,7 +149,7 @@ export default function HomeScreen() {
         {isLoading ? (
           <ActivityIndicator
             size="small"
-            color={lightColors.primary}
+            color={colors.primary}
             style={{ marginVertical: sizes.md }}
           />
         ) : isError ? (
@@ -149,7 +157,7 @@ export default function HomeScreen() {
             <Ionicons
               name="alert-circle-outline"
               size={50}
-              color={lightColors.primary}
+              color={colors.primary}
             />
 
             <Text style={styles.errorText}>Failed to load products</Text>
@@ -200,7 +208,7 @@ export default function HomeScreen() {
         {/* Products */}
         {isLoading ? (
           <View style={styles.productsLoading}>
-            <ActivityIndicator size="large" color={lightColors.primary} />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.loadingText}>Loading products...</Text>
           </View>
         ) : isError ? (
@@ -208,7 +216,7 @@ export default function HomeScreen() {
             <Ionicons
               name="alert-circle-outline"
               size={50}
-              color={lightColors.primary}
+              color={colors.primary}
             />
             <Text style={styles.errorText}>Failed to load products</Text>
           </View>
@@ -230,220 +238,226 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) => {
+  const isDark = colors.background === '#0F0F0F';
 
-  header: {
-    flexDirection: "row",
-    height: 70,
-    paddingHorizontal: sizes.lg,
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: lightColors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: lightColors.border,
-  },
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  appName: {
-    fontSize: sizes.fontXl,
-    fontWeight: "800",
-    letterSpacing: 3,
-    color: lightColors.text,
-  },
+    header: {
+      flexDirection: "row",
+      height: 70,
+      paddingHorizontal: sizes.lg,
+      alignItems: "center",
+      justifyContent: "space-between",
+      backgroundColor: colors.background,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  profileButton: {
-    width: 46,
-    height: 46,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-  },
+    appName: {
+      fontSize: sizes.fontXl,
+      fontWeight: "800",
+      letterSpacing: 3,
+      color: colors.text,
+    },
 
-  profileImage: {
-    width: "100%",
-    height: "100%",
-  },
+    profileButton: {
+      width: 46,
+      height: 46,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+      overflow: "hidden",
+    },
 
-  iconButton: {
-    width: 46,
-    height: 46,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    profileImage: {
+      width: "100%",
+      height: "100%",
+    },
 
-  container: {
-    padding: sizes.lg,
-    paddingBottom: sizes.xl,
-  },
+    iconButton: {
+      width: 46,
+      height: 46,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+      position: "relative",
+    },
 
-  banner: {
-    minHeight: 190,
-    borderRadius: sizes.radiusLg,
-    backgroundColor: lightColors.primary,
-    padding: sizes.lg,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    overflow: "hidden",
-  },
+    container: {
+      padding: sizes.lg,
+      paddingBottom: sizes.bottomNavInset,
+    },
 
-  bannerContent: {
-    flex: 1,
-  },
+    banner: {
+      minHeight: 190,
+      borderRadius: sizes.radiusLg,
+      backgroundColor: colors.primary,
+      padding: sizes.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      overflow: "hidden",
+    },
 
-  bannerSmallText: {
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-    color: lightColors.primaryLight,
-    letterSpacing: 1,
-  },
+    bannerContent: {
+      flex: 1,
+    },
 
-  bannerTitle: {
-    marginTop: sizes.sm,
-    fontSize: sizes.fontXl,
-    fontWeight: "800",
-    color: lightColors.white,
-    lineHeight: 28,
-  },
+    bannerSmallText: {
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+      color: colors.primaryLight,
+      letterSpacing: 1,
+    },
 
-  shopButton: {
-    alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: sizes.md,
-    paddingVertical: sizes.sm,
-    paddingHorizontal: sizes.md,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.text,
-    gap: sizes.xs,
-  },
+    bannerTitle: {
+      marginTop: sizes.sm,
+      fontSize: sizes.fontXl,
+      fontWeight: "800",
+      color: colors.white,
+      lineHeight: 28,
+    },
 
-  shopButtonText: {
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-    color: lightColors.white,
-  },
+    shopButton: {
+      alignSelf: "flex-start",
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: sizes.md,
+      paddingVertical: sizes.sm,
+      paddingHorizontal: sizes.md,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.text,
+      gap: sizes.xs,
+    },
 
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: sizes.xl,
-    marginBottom: sizes.md,
-  },
+    shopButtonText: {
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+      color: isDark ? colors.background : colors.white,
+    },
 
-  sectionTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    sectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: sizes.xl,
+      marginBottom: sizes.md,
+    },
 
-  selectedCategoryText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.primary,
-  },
+    sectionTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  productCount: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-  },
+    selectedCategoryText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.primary,
+    },
 
-  categoryContainer: {
-    gap: sizes.sm,
-    paddingRight: sizes.lg,
-  },
+    productCount: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+    },
 
-  categoryCard: {
-    minWidth: 100,
-    height: 60,
-    paddingHorizontal: sizes.md,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    categoryContainer: {
+      gap: sizes.sm,
+      paddingRight: sizes.lg,
+    },
 
-  categoryCardActive: {
-    backgroundColor: lightColors.primary,
-    borderColor: lightColors.primary,
-  },
+    categoryCard: {
+      minWidth: 100,
+      height: 60,
+      paddingHorizontal: sizes.md,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  categoryText: {
-    fontSize: sizes.fontXs,
-    fontWeight: "600",
-    color: lightColors.text,
-    textTransform: "capitalize",
-  },
+    categoryCardActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
 
-  categoryTextActive: {
-    color: lightColors.white,
-  },
+    categoryText: {
+      fontSize: sizes.fontXs,
+      fontWeight: "600",
+      color: colors.text,
+      textTransform: "capitalize",
+    },
 
-  productsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    rowGap: sizes.lg,
-  },
+    categoryTextActive: {
+      color: colors.white,
+    },
 
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.sm,
-  },
+    productsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      rowGap: sizes.lg,
+    },
 
-  badge: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    backgroundColor: lightColors.primary,
-    borderRadius: sizes.radiusRound,
-    minWidth: 18,
-    height: 18,
-    paddingHorizontal: 4,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    headerRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.sm,
+    },
 
-  badgeText: {
-    color: lightColors.white,
-    fontSize: 10,
-    fontWeight: "700",
-  },
+    badge: {
+      position: "absolute",
+      top: -4,
+      right: -4,
+      backgroundColor: colors.primary,
+      borderRadius: sizes.radiusRound,
+      minWidth: 18,
+      height: 18,
+      paddingHorizontal: 4,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: lightColors.background,
-  },
+    badgeText: {
+      color: colors.white,
+      fontSize: 10,
+      fontWeight: "700",
+    },
 
-  loadingText: {
-    marginTop: sizes.md,
-    fontSize: sizes.fontMd,
-    color: lightColors.text,
-  },
-  productsLoading: {
-    minHeight: 300,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    center: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+    },
 
-  errorText: {
-    marginTop: sizes.md,
-    fontSize: sizes.fontMd,
-    color: lightColors.text,
-  },
-});
+    loadingText: {
+      marginTop: sizes.md,
+      fontSize: sizes.fontMd,
+      color: colors.text,
+    },
+
+    productsLoading: {
+      minHeight: 300,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+
+    errorText: {
+      marginTop: sizes.md,
+      fontSize: sizes.fontMd,
+      color: colors.text,
+    },
+  });
+};

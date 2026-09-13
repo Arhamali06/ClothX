@@ -13,11 +13,11 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
 import type { RootStackParamList } from '../types/navigation';
 import { useFavorites } from '../context/FavoritesContext';
 import { useCart } from '../context/CartContext';
+import { useTheme, type ThemeColors } from '../context/ThemeContext';
 
 export default function ProductDetailsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -26,6 +26,7 @@ export default function ProductDetailsScreen() {
 
   const { isFavorite, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
+  const { colors } = useTheme();
   const [selectedSize, setSelectedSize] = useState<string>('M');
 
   const availableSizes = ['S', 'M', 'L', 'XL'];
@@ -34,6 +35,8 @@ export default function ProductDetailsScreen() {
   const handleAddToCart = () => {
     addToCart(product, 1, selectedSize);
   };
+
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -49,7 +52,7 @@ export default function ProductDetailsScreen() {
           <Ionicons
             name="arrow-back"
             size={sizes.fontXl}
-            color={lightColors.text}
+            color={colors.text}
           />
         </Pressable>
 
@@ -72,8 +75,8 @@ export default function ProductDetailsScreen() {
             size={sizes.fontXl}
             color={
               favorite
-                ? lightColors.danger
-                : lightColors.text
+                ? colors.danger
+                : colors.text
             }
           />
         </Pressable>
@@ -111,35 +114,11 @@ export default function ProductDetailsScreen() {
           {/* Rating */}
           <View style={styles.ratingRow}>
             <View style={styles.stars}>
-              <Ionicons
-                name="star"
-                size={18}
-                color={lightColors.accent}
-              />
-
-              <Ionicons
-                name="star"
-                size={18}
-                color={lightColors.accent}
-              />
-
-              <Ionicons
-                name="star"
-                size={18}
-                color={lightColors.accent}
-              />
-
-              <Ionicons
-                name="star"
-                size={18}
-                color={lightColors.accent}
-              />
-
-              <Ionicons
-                name="star-half"
-                size={18}
-                color={lightColors.accent}
-              />
+              <Ionicons name="star" size={18} color={colors.accent} />
+              <Ionicons name="star" size={18} color={colors.accent} />
+              <Ionicons name="star" size={18} color={colors.accent} />
+              <Ionicons name="star" size={18} color={colors.accent} />
+              <Ionicons name="star-half" size={18} color={colors.accent} />
             </View>
 
             <Text style={styles.ratingText}>
@@ -195,7 +174,7 @@ export default function ProductDetailsScreen() {
             <Ionicons
               name="bag-add-outline"
               size={sizes.fontLg}
-              color={lightColors.white}
+              color={colors.white}
             />
 
             <Text style={styles.cartButtonText}>
@@ -209,175 +188,176 @@ export default function ProductDetailsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    paddingHorizontal: sizes.lg,
-    paddingBottom: sizes.xl,
-  },
+    container: {
+      paddingHorizontal: sizes.lg,
+      paddingBottom: sizes.xl,
+    },
 
-  // Header
-  header: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: sizes.lg,
-  },
+    // Header
+    header: {
+      height: 60,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: sizes.lg,
+    },
 
-  headerTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: '700',
-    color: lightColors.text,
-  },
+    headerTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: '700',
+      color: colors.text,
+    },
 
-  backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    backButton: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
 
-  favoriteButton: {
-    width: 42,
-    height: 42,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    favoriteButton: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
 
-  // Image
-  imageContainer: {
-    height: 380,
-    marginTop: sizes.sm,
-    borderRadius: sizes.radiusLg,
-    backgroundColor: lightColors.inputBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow:"hidden",
-  },
+    // Image
+    imageContainer: {
+      height: 380,
+      marginTop: sizes.sm,
+      borderRadius: sizes.radiusLg,
+      backgroundColor: colors.inputBg,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
 
-  productImage: {
-    width: '100%',
-    height: '100%',
-  },
+    productImage: {
+      width: '100%',
+      height: '100%',
+    },
 
-  // Information
-  productInfo: {
-    marginTop: sizes.lg,
-  },
+    // Information
+    productInfo: {
+      marginTop: sizes.lg,
+    },
 
-  category: {
-    fontSize: sizes.fontSm,
-    fontWeight: '600',
-    color: lightColors.primary,
-  },
+    category: {
+      fontSize: sizes.fontSm,
+      fontWeight: '600',
+      color: colors.primary,
+    },
 
-  productName: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontXxl,
-    fontWeight: '800',
-    color: lightColors.text,
-  },
+    productName: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontXxl,
+      fontWeight: '800',
+      color: colors.text,
+    },
 
-  price: {
-    marginTop: sizes.sm,
-    fontSize: sizes.fontXxl,
-    fontWeight: '800',
-    color: lightColors.primary,
-  },
+    price: {
+      marginTop: sizes.sm,
+      fontSize: sizes.fontXxl,
+      fontWeight: '800',
+      color: colors.primary,
+    },
 
-  // Rating
-  ratingRow: {
-    marginTop: sizes.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+    // Rating
+    ratingRow: {
+      marginTop: sizes.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
 
-  stars: {
-    flexDirection: 'row',
-  },
+    stars: {
+      flexDirection: 'row',
+    },
 
-  ratingText: {
-    marginLeft: sizes.sm,
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-  },
+    ratingText: {
+      marginLeft: sizes.sm,
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+    },
 
-  // Description
-  sectionTitle: {
-    marginTop: sizes.xl,
-    marginBottom: sizes.sm,
-    fontSize: sizes.fontLg,
-    fontWeight: '700',
-    color: lightColors.text,
-  },
+    // Description
+    sectionTitle: {
+      marginTop: sizes.xl,
+      marginBottom: sizes.sm,
+      fontSize: sizes.fontLg,
+      fontWeight: '700',
+      color: colors.text,
+    },
 
-  description: {
-    fontSize: sizes.fontSm,
-    lineHeight: 22,
-    color: lightColors.mutedText,
-  },
+    description: {
+      fontSize: sizes.fontSm,
+      lineHeight: 22,
+      color: colors.mutedText,
+    },
 
-  // Size
-  sizeContainer: {
-    flexDirection: 'row',
-    gap: sizes.sm,
-  },
+    // Size
+    sizeContainer: {
+      flexDirection: 'row',
+      gap: sizes.sm,
+    },
 
-  sizeButton: {
-    width: 48,
-    height: 42,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    sizeButton: {
+      width: 48,
+      height: 42,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
 
-  sizeButtonActive: {
-    backgroundColor: lightColors.primary,
-    borderColor: lightColors.primary,
-  },
+    sizeButtonActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
 
-  sizeText: {
-    fontSize: sizes.fontSm,
-    fontWeight: '600',
-    color: lightColors.text,
-  },
+    sizeText: {
+      fontSize: sizes.fontSm,
+      fontWeight: '600',
+      color: colors.text,
+    },
 
-  sizeTextActive: {
-    color: lightColors.white,
-    fontWeight: '700',
-  },
+    sizeTextActive: {
+      color: colors.white,
+      fontWeight: '700',
+    },
 
-  // Cart
-  cartButton: {
-    height: 54,
-    marginTop: sizes.xl,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: sizes.sm,
-  },
+    // Cart
+    cartButton: {
+      height: 54,
+      marginTop: sizes.xl,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: sizes.sm,
+    },
 
-  cartButtonText: {
-    fontSize: sizes.fontSm,
-    fontWeight: '700',
-    color: lightColors.white,
-  },
-});
+    cartButtonText: {
+      fontSize: sizes.fontSm,
+      fontWeight: '700',
+      color: colors.white,
+    },
+  });

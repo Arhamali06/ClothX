@@ -20,10 +20,9 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
-
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 
 // ZOD VALIDATION SCHEMA
 const signupSchema = z
@@ -64,6 +63,7 @@ export default function SignupScreen({ navigation }: Props) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const heroHeight = useRef(new Animated.Value(heroExpandedHeight)).current;
+  const { colors } = useTheme();
 
   useEffect(() => {
     const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
@@ -116,9 +116,11 @@ export default function SignupScreen({ navigation }: Props) {
     navigation.replace("Login");
   };
 
+  const styles = createStyles(colors);
+
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor={lightColors.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -146,7 +148,7 @@ export default function SignupScreen({ navigation }: Props) {
             {isKeyboardOpen ? (
               <View style={styles.compactHeroRow}>
                 <View style={styles.compactLogoWrapper}>
-                  <Ionicons name="shirt-outline" size={20} color={lightColors.white} />
+                  <Ionicons name="shirt-outline" size={20} color={colors.white} />
                 </View>
                 <Text style={styles.compactBrandName}>CLOTHX</Text>
               </View>
@@ -154,7 +156,7 @@ export default function SignupScreen({ navigation }: Props) {
               <>
                 <View style={styles.logoWrapper}>
                   <View style={styles.logoInner}>
-                    <Ionicons name="shirt-outline" size={30} color={lightColors.white} />
+                    <Ionicons name="shirt-outline" size={30} color={colors.white} />
                   </View>
                 </View>
 
@@ -176,7 +178,7 @@ export default function SignupScreen({ navigation }: Props) {
                 <Ionicons
                   name="person-outline"
                   size={18}
-                  color={errors.name ? lightColors.danger : lightColors.mutedText}
+                  color={errors.name ? colors.danger : colors.mutedText}
                 />
                 <Controller
                   control={control}
@@ -185,7 +187,7 @@ export default function SignupScreen({ navigation }: Props) {
                     <TextInput
                       style={styles.input}
                       placeholder="Enter your full name"
-                      placeholderTextColor={lightColors.mutedText}
+                      placeholderTextColor={colors.mutedText}
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -207,7 +209,7 @@ export default function SignupScreen({ navigation }: Props) {
                 <Ionicons
                   name="mail-outline"
                   size={18}
-                  color={errors.email ? lightColors.danger : lightColors.mutedText}
+                  color={errors.email ? colors.danger : colors.mutedText}
                 />
                 <Controller
                   control={control}
@@ -216,7 +218,7 @@ export default function SignupScreen({ navigation }: Props) {
                     <TextInput
                       style={styles.input}
                       placeholder="Enter your email"
-                      placeholderTextColor={lightColors.mutedText}
+                      placeholderTextColor={colors.mutedText}
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -239,7 +241,7 @@ export default function SignupScreen({ navigation }: Props) {
                 <Ionicons
                   name="lock-closed-outline"
                   size={18}
-                  color={errors.password ? lightColors.danger : lightColors.mutedText}
+                  color={errors.password ? colors.danger : colors.mutedText}
                 />
                 <Controller
                   control={control}
@@ -248,7 +250,7 @@ export default function SignupScreen({ navigation }: Props) {
                     <TextInput
                       style={styles.input}
                       placeholder="Create a password"
-                      placeholderTextColor={lightColors.mutedText}
+                      placeholderTextColor={colors.mutedText}
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -266,7 +268,7 @@ export default function SignupScreen({ navigation }: Props) {
                   <Ionicons
                     name={showPassword ? "eye-outline" : "eye-off-outline"}
                     size={18}
-                    color={lightColors.mutedText}
+                    color={colors.mutedText}
                   />
                 </Pressable>
               </View>
@@ -282,7 +284,7 @@ export default function SignupScreen({ navigation }: Props) {
                 <Ionicons
                   name="shield-checkmark-outline"
                   size={18}
-                  color={errors.confirmPassword ? lightColors.danger : lightColors.mutedText}
+                  color={errors.confirmPassword ? colors.danger : colors.mutedText}
                 />
                 <Controller
                   control={control}
@@ -291,7 +293,7 @@ export default function SignupScreen({ navigation }: Props) {
                     <TextInput
                       style={styles.input}
                       placeholder="Confirm your password"
-                      placeholderTextColor={lightColors.mutedText}
+                      placeholderTextColor={colors.mutedText}
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -309,7 +311,7 @@ export default function SignupScreen({ navigation }: Props) {
                   <Ionicons
                     name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
                     size={18}
-                    color={lightColors.mutedText}
+                    color={colors.mutedText}
                   />
                 </Pressable>
               </View>
@@ -326,7 +328,7 @@ export default function SignupScreen({ navigation }: Props) {
               onPress={handleSubmit(handleSignup)}
             >
               <Text style={styles.signupButtonText}>CREATE ACCOUNT</Text>
-              <Ionicons name="arrow-forward" size={18} color={lightColors.white} />
+              <Ionicons name="arrow-forward" size={18} color={colors.white} />
             </Pressable>
 
             {/* LOGIN LINK */}
@@ -343,227 +345,228 @@ export default function SignupScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    root: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  scrollContainer: {
-    flexGrow: 1,
-    backgroundColor: lightColors.background,
-  },
+    scrollContainer: {
+      flexGrow: 1,
+      backgroundColor: colors.background,
+    },
 
-  scrollContainerKeyboard: {
-    paddingBottom: 40,
-  },
+    scrollContainerKeyboard: {
+      paddingBottom: 40,
+    },
 
-  /* ── Hero ── */
-  heroSection: {
-    backgroundColor: lightColors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    paddingBottom: sizes.md,
-  },
+    /* ── Hero ── */
+    heroSection: {
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+      paddingBottom: sizes.md,
+    },
 
-  compactHeroRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingTop: sizes.xs,
-  },
+    compactHeroRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      paddingTop: sizes.xs,
+    },
 
-  compactLogoWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    compactLogoWrapper: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: "rgba(255,255,255,0.25)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  compactBrandName: {
-    fontSize: 16,
-    fontWeight: "800",
-    letterSpacing: 4,
-    color: lightColors.white,
-  },
+    compactBrandName: {
+      fontSize: 16,
+      fontWeight: "800",
+      letterSpacing: 4,
+      color: colors.white,
+    },
 
-  blobTopRight: {
-    position: "absolute",
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: "rgba(255,255,255,0.10)",
-    top: -40,
-    right: -40,
-  },
+    blobTopRight: {
+      position: "absolute",
+      width: 160,
+      height: 160,
+      borderRadius: 80,
+      backgroundColor: "rgba(255,255,255,0.10)",
+      top: -40,
+      right: -40,
+    },
 
-  blobBottomLeft: {
-    position: "absolute",
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    bottom: 10,
-    left: -30,
-  },
+    blobBottomLeft: {
+      position: "absolute",
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor: "rgba(255,255,255,0.07)",
+      bottom: 10,
+      left: -30,
+    },
 
-  logoWrapper: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: "rgba(255,255,255,0.20)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: sizes.sm,
-  },
+    logoWrapper: {
+      width: 68,
+      height: 68,
+      borderRadius: 34,
+      backgroundColor: "rgba(255,255,255,0.20)",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: sizes.sm,
+    },
 
-  logoInner: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: "rgba(255,255,255,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    logoInner: {
+      width: 54,
+      height: 54,
+      borderRadius: 27,
+      backgroundColor: "rgba(255,255,255,0.25)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  brandName: {
-    fontSize: 22,
-    fontWeight: "800",
-    letterSpacing: 6,
-    color: lightColors.white,
-    marginBottom: 4,
-  },
+    brandName: {
+      fontSize: 22,
+      fontWeight: "800",
+      letterSpacing: 6,
+      color: colors.white,
+      marginBottom: 4,
+    },
 
-  heroTagline: {
-    fontSize: sizes.fontSm,
-    color: "rgba(255,255,255,0.75)",
-    letterSpacing: 0.5,
-  },
+    heroTagline: {
+      fontSize: sizes.fontSm,
+      color: "rgba(255,255,255,0.75)",
+      letterSpacing: 0.5,
+    },
 
-  /* ── Card ── */
-  card: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: sizes.lg,
-    paddingTop: sizes.xl,
-    paddingBottom: sizes.lg,
-    marginTop: -24,
-  },
+    /* ── Card ── */
+    card: {
+      flex: 1,
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
+      paddingHorizontal: sizes.lg,
+      paddingTop: sizes.xl,
+      paddingBottom: sizes.lg,
+      marginTop: -24,
+    },
 
-  title: {
-    fontSize: sizes.fontXxl,
-    fontWeight: "800",
-    color: lightColors.text,
-    marginBottom: 4,
-  },
+    title: {
+      fontSize: sizes.fontXxl,
+      fontWeight: "800",
+      color: colors.text,
+      marginBottom: 4,
+    },
 
-  subtitle: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-    marginBottom: sizes.xl,
-    lineHeight: 20,
-  },
+    subtitle: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+      marginBottom: sizes.xl,
+      lineHeight: 20,
+    },
 
-  /* ── Fields ── */
-  fieldGroup: {
-    marginBottom: sizes.md,
-  },
+    /* ── Fields ── */
+    fieldGroup: {
+      marginBottom: sizes.md,
+    },
 
-  label: {
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-    color: lightColors.text,
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    marginBottom: 6,
-  },
+    label: {
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+      color: colors.text,
+      letterSpacing: 0.8,
+      textTransform: "uppercase",
+      marginBottom: 6,
+    },
 
-  inputWrapper: {
-    height: 54,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: sizes.md,
-    borderRadius: sizes.radiusLg,
-    backgroundColor: lightColors.inputBg,
-    borderWidth: 1.5,
-    borderColor: "transparent",
-  },
+    inputWrapper: {
+      height: 54,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: sizes.md,
+      borderRadius: sizes.radiusLg,
+      backgroundColor: colors.inputBg,
+      borderWidth: 1.5,
+      borderColor: "transparent",
+    },
 
-  inputError: {
-    borderColor: lightColors.danger,
-    backgroundColor: "#FFF5F5",
-  },
+    inputError: {
+      borderColor: colors.danger,
+      backgroundColor: colors.inputBg,
+    },
 
-  input: {
-    flex: 1,
-    marginLeft: 10,
-    paddingVertical: 0,
-    fontSize: sizes.fontMd,
-    color: lightColors.text,
-  },
+    input: {
+      flex: 1,
+      marginLeft: 10,
+      paddingVertical: 0,
+      fontSize: sizes.fontMd,
+      color: colors.text,
+    },
 
-  eyeButton: {
-    padding: sizes.xs,
-  },
+    eyeButton: {
+      padding: sizes.xs,
+    },
 
-  errorText: {
-    marginTop: 5,
-    fontSize: sizes.fontXs,
-    color: lightColors.danger,
-  },
+    errorText: {
+      marginTop: 5,
+      fontSize: sizes.fontXs,
+      color: colors.danger,
+    },
 
-  /* ── Signup Button ── */
-  signupButton: {
-    height: 56,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.primary,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: sizes.sm,
-    marginTop: sizes.sm,
-    shadowColor: lightColors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 8,
-  },
+    /* ── Signup Button ── */
+    signupButton: {
+      height: 56,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.primary,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: sizes.sm,
+      marginTop: sizes.sm,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.35,
+      shadowRadius: 12,
+      elevation: 8,
+    },
 
-  signupButtonText: {
-    fontSize: sizes.fontMd,
-    fontWeight: "800",
-    color: lightColors.white,
-    letterSpacing: 1.5,
-  },
+    signupButtonText: {
+      fontSize: sizes.fontMd,
+      fontWeight: "800",
+      color: colors.white,
+      letterSpacing: 1.5,
+    },
 
-  /* ── Login Link ── */
-  loginContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: sizes.lg,
-    paddingBottom: sizes.sm,
-  },
+    /* ── Login Link ── */
+    loginContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: sizes.lg,
+      paddingBottom: sizes.sm,
+    },
 
-  loginText: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-  },
+    loginText: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+    },
 
-  loginLink: {
-    fontSize: sizes.fontSm,
-    fontWeight: "800",
-    color: lightColors.primary,
-  },
-});
+    loginLink: {
+      fontSize: sizes.fontSm,
+      fontWeight: "800",
+      color: colors.primary,
+    },
+  });

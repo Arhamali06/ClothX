@@ -12,15 +12,18 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
 import { useFavorites, FavoriteItem } from "../context/FavoritesContext";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 
 export default function FavoritesScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const { colors } = useTheme();
+
+  const styles = createStyles(colors);
 
   const handleProductPress = (item: FavoriteItem) => {
     navigation.navigate("ProductDetails", {
@@ -47,7 +50,7 @@ export default function FavoritesScreen() {
         <Ionicons
           name="heart-outline"
           size={56}
-          color={lightColors.primary}
+          color={colors.primary}
         />
       </View>
       <Text style={styles.emptyTitle}>No Favorites Yet</Text>
@@ -64,7 +67,7 @@ export default function FavoritesScreen() {
         <Ionicons
           name="arrow-forward"
           size={sizes.fontMd}
-          color={lightColors.white}
+          color={colors.white}
         />
       </Pressable>
     </View>
@@ -83,7 +86,7 @@ export default function FavoritesScreen() {
           <Ionicons
             name="arrow-back"
             size={sizes.fontXl}
-            color={lightColors.text}
+            color={colors.text}
           />
         </Pressable>
 
@@ -131,7 +134,7 @@ export default function FavoritesScreen() {
                   <Ionicons
                     name="image-outline"
                     size={40}
-                    color={lightColors.mutedText}
+                    color={colors.mutedText}
                   />
                 )}
 
@@ -147,7 +150,7 @@ export default function FavoritesScreen() {
                   <Ionicons
                     name={favorite ? "heart" : "heart-outline"}
                     size={18}
-                    color={favorite ? lightColors.danger : lightColors.text}
+                    color={favorite ? colors.danger : colors.text}
                   />
                 </Pressable>
               </View>
@@ -168,172 +171,173 @@ export default function FavoritesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  header: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: sizes.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: lightColors.border,
-  },
+    header: {
+      height: 60,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: sizes.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    backButton: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  headerTitleContainer: {
-    alignItems: "center",
-  },
+    headerTitleContainer: {
+      alignItems: "center",
+    },
 
-  headerTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    headerTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  headerSubtitle: {
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    marginTop: 2,
-  },
+    headerSubtitle: {
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      marginTop: 2,
+    },
 
-  placeholder: {
-    width: 42,
-  },
+    placeholder: {
+      width: 42,
+    },
 
-  productList: {
-    padding: sizes.lg,
-    paddingBottom: sizes.xl,
-  },
+    productList: {
+      padding: sizes.lg,
+      paddingBottom: sizes.xl,
+    },
 
-  emptyListContent: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
+    emptyListContent: {
+      flexGrow: 1,
+      justifyContent: "center",
+    },
 
-  productRow: {
-    justifyContent: "space-between",
-    marginBottom: sizes.lg,
-  },
+    productRow: {
+      justifyContent: "space-between",
+      marginBottom: sizes.lg,
+    },
 
-  productCard: {
-    width: "48%",
-  },
+    productCard: {
+      width: "48%",
+    },
 
-  productImage: {
-    height: 190,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
-  },
+    productImage: {
+      height: 190,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      position: "relative",
+      overflow: "hidden",
+    },
 
-  productImageStyle: {
-    width: "100%",
-    height: "100%",
-  },
+    productImageStyle: {
+      width: "100%",
+      height: "100%",
+    },
 
-  favoriteButton: {
-    position: "absolute",
-    top: sizes.sm,
-    right: sizes.sm,
-    width: 32,
-    height: 32,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.white,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-  },
+    favoriteButton: {
+      position: "absolute",
+      top: sizes.sm,
+      right: sizes.sm,
+      width: 32,
+      height: 32,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.cardBg,
+      alignItems: "center",
+      justifyContent: "center",
+      elevation: 2,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.15,
+      shadowRadius: 2,
+    },
 
-  productName: {
-    marginTop: sizes.sm,
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    productName: {
+      marginTop: sizes.sm,
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  productCategory: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    textTransform: "capitalize",
-  },
+    productCategory: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      textTransform: "capitalize",
+    },
 
-  productPrice: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.primary,
-  },
+    productPrice: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.primary,
+    },
 
-  emptyContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: sizes.xl,
-    paddingVertical: 48,
-  },
+    emptyContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: sizes.xl,
+      paddingVertical: 48,
+    },
 
-  emptyIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: sizes.lg,
-  },
+    emptyIconCircle: {
+      width: 100,
+      height: 100,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: sizes.lg,
+    },
 
-  emptyTitle: {
-    fontSize: sizes.fontXl,
-    fontWeight: "800",
-    color: lightColors.text,
-    textAlign: "center",
-    marginBottom: sizes.sm,
-  },
+    emptyTitle: {
+      fontSize: sizes.fontXl,
+      fontWeight: "800",
+      color: colors.text,
+      textAlign: "center",
+      marginBottom: sizes.sm,
+    },
 
-  emptySubtitle: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-    textAlign: "center",
-    lineHeight: 20,
-    maxWidth: 260,
-    marginBottom: sizes.xl,
-  },
+    emptySubtitle: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+      textAlign: "center",
+      lineHeight: 20,
+      maxWidth: 260,
+      marginBottom: sizes.xl,
+    },
 
-  exploreButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.xs,
-    backgroundColor: lightColors.primary,
-    paddingVertical: sizes.sm + 2,
-    paddingHorizontal: sizes.lg,
-    borderRadius: sizes.radiusMd,
-  },
+    exploreButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.xs,
+      backgroundColor: colors.primary,
+      paddingVertical: sizes.sm + 2,
+      paddingHorizontal: sizes.lg,
+      borderRadius: sizes.radiusMd,
+    },
 
-  exploreButtonText: {
-    color: lightColors.white,
-    fontWeight: "700",
-    fontSize: sizes.fontSm,
-  },
-});
+    exploreButtonText: {
+      color: colors.white,
+      fontWeight: "700",
+      fontSize: sizes.fontSm,
+    },
+  });

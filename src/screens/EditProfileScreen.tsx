@@ -19,7 +19,7 @@ import { Camera } from "expo-camera";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { useAuth } from "../context/AuthContext";
-import { lightColors } from "../constants/colors";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
 
@@ -27,6 +27,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "EditProfile">;
 
 export default function EditProfileScreen({ navigation }: Props) {
   const { user, updateUser } = useAuth();
+  const { colors } = useTheme();
 
   const [name, setName] = useState(user?.username ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
@@ -108,6 +109,8 @@ export default function EditProfileScreen({ navigation }: Props) {
     navigation.goBack();
   };
 
+  const styles = createStyles(colors);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -125,7 +128,7 @@ export default function EditProfileScreen({ navigation }: Props) {
             <Ionicons
               name="arrow-back"
               size={sizes.fontXl}
-              color={lightColors.text}
+              color={colors.text}
             />
           </Pressable>
 
@@ -156,7 +159,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                   <Ionicons
                     name="person"
                     size={48}
-                    color={lightColors.cardBg}
+                    color={colors.cardBg}
                   />
                 </View>
               )}
@@ -171,7 +174,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                 <Ionicons
                   name="camera"
                   size={sizes.fontMd}
-                  color={lightColors.white}
+                  color={colors.white}
                 />
               </Pressable>
             </View>
@@ -183,7 +186,7 @@ export default function EditProfileScreen({ navigation }: Props) {
               <Ionicons
                 name="camera-outline"
                 size={sizes.fontMd}
-                color={lightColors.primary}
+                color={colors.primary}
               />
               <Text style={styles.changePhotoText}>Change Photo</Text>
             </Pressable>
@@ -200,7 +203,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                 <Ionicons
                   name="person-outline"
                   size={sizes.fontLg}
-                  color={lightColors.mutedText}
+                  color={colors.mutedText}
                   style={styles.inputIcon}
                 />
                 <TextInput
@@ -208,7 +211,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                   value={name}
                   onChangeText={setName}
                   placeholder="Enter your name"
-                  placeholderTextColor={lightColors.mutedText}
+                  placeholderTextColor={colors.mutedText}
                   autoCapitalize="words"
                 />
               </View>
@@ -223,7 +226,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                 <Ionicons
                   name="mail-outline"
                   size={sizes.fontLg}
-                  color={lightColors.mutedText}
+                  color={colors.mutedText}
                   style={styles.inputIcon}
                 />
                 <TextInput
@@ -231,7 +234,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                   value={email}
                   onChangeText={setEmail}
                   placeholder="Enter email address"
-                  placeholderTextColor={lightColors.mutedText}
+                  placeholderTextColor={colors.mutedText}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -248,7 +251,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                 <Ionicons
                   name="call-outline"
                   size={sizes.fontLg}
-                  color={lightColors.mutedText}
+                  color={colors.mutedText}
                   style={styles.inputIcon}
                 />
                 <TextInput
@@ -256,7 +259,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                   value={phone}
                   onChangeText={setPhone}
                   placeholder="+92 000 0000000"
-                  placeholderTextColor={lightColors.mutedText}
+                  placeholderTextColor={colors.mutedText}
                   keyboardType="phone-pad"
                 />
               </View>
@@ -273,7 +276,7 @@ export default function EditProfileScreen({ navigation }: Props) {
             <Ionicons
               name="checkmark-circle-outline"
               size={sizes.fontXl}
-              color={lightColors.white}
+              color={colors.white}
             />
             <Text style={styles.saveButtonText}>Save Changes</Text>
           </Pressable>
@@ -311,7 +314,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                   <Ionicons
                     name="camera"
                     size={sizes.fontXl}
-                    color={lightColors.primary}
+                    color={colors.primary}
                   />
                 </View>
                 <View style={styles.modalOptionTextContainer}>
@@ -323,7 +326,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                 <Ionicons
                   name="chevron-forward"
                   size={sizes.fontMd}
-                  color={lightColors.mutedText}
+                  color={colors.mutedText}
                 />
               </Pressable>
 
@@ -338,7 +341,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                   <Ionicons
                     name="images"
                     size={sizes.fontXl}
-                    color={lightColors.primary}
+                    color={colors.primary}
                   />
                 </View>
                 <View style={styles.modalOptionTextContainer}>
@@ -352,7 +355,7 @@ export default function EditProfileScreen({ navigation }: Props) {
                 <Ionicons
                   name="chevron-forward"
                   size={sizes.fontMd}
-                  color={lightColors.mutedText}
+                  color={colors.mutedText}
                 />
               </Pressable>
 
@@ -367,20 +370,20 @@ export default function EditProfileScreen({ navigation }: Props) {
                   <View
                     style={[
                       styles.modalOptionIconContainer,
-                      { backgroundColor: "#FDF0F0" },
+                      { backgroundColor: `${colors.danger}18` },
                     ]}
                   >
                     <Ionicons
                       name="trash-outline"
                       size={sizes.fontXl}
-                      color={lightColors.danger}
+                      color={colors.danger}
                     />
                   </View>
                   <View style={styles.modalOptionTextContainer}>
                     <Text
                       style={[
                         styles.modalOptionTitle,
-                        { color: lightColors.danger },
+                        { color: colors.danger },
                       ]}
                     >
                       Remove Photo
@@ -407,297 +410,298 @@ export default function EditProfileScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  // Header
-  header: {
-    paddingHorizontal: sizes.lg,
-    paddingTop: sizes.md,
-    paddingBottom: sizes.sm,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+    // Header
+    header: {
+      paddingHorizontal: sizes.lg,
+      paddingTop: sizes.md,
+      paddingBottom: sizes.sm,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
 
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    backButton: {
+      width: 44,
+      height: 44,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  headerTitle: {
-    fontSize: sizes.fontXl,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    headerTitle: {
+      fontSize: sizes.fontXl,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  saveHeaderButton: {
-    paddingHorizontal: sizes.md,
-    paddingVertical: sizes.sm,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    minWidth: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    saveHeaderButton: {
+      paddingHorizontal: sizes.md,
+      paddingVertical: sizes.sm,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      minWidth: 44,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  saveHeaderText: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.primary,
-  },
+    saveHeaderText: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.primary,
+    },
 
-  container: {
-    paddingHorizontal: sizes.lg,
-    paddingTop: sizes.md,
-    paddingBottom: sizes.xl,
-  },
+    container: {
+      paddingHorizontal: sizes.lg,
+      paddingTop: sizes.md,
+      paddingBottom: sizes.xl,
+    },
 
-  // Avatar Section
-  avatarSection: {
-    alignItems: "center",
-    marginBottom: sizes.lg,
-  },
+    // Avatar Section
+    avatarSection: {
+      alignItems: "center",
+      marginBottom: sizes.lg,
+    },
 
-  avatarWrapper: {
-    position: "relative",
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-  },
+    avatarWrapper: {
+      position: "relative",
+      width: 110,
+      height: 110,
+      borderRadius: 55,
+      elevation: 4,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+    },
 
-  avatarImage: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: lightColors.border,
-  },
+    avatarImage: {
+      width: 110,
+      height: 110,
+      borderRadius: 55,
+      backgroundColor: colors.border,
+    },
 
-  avatarPlaceholder: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: lightColors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    avatarPlaceholder: {
+      width: 110,
+      height: 110,
+      borderRadius: 55,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  cameraBadge: {
-    position: "absolute",
-    right: 0,
-    bottom: 2,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: lightColors.primary,
-    borderWidth: 3,
-    borderColor: lightColors.background,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 3,
-  },
+    cameraBadge: {
+      position: "absolute",
+      right: 0,
+      bottom: 2,
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.primary,
+      borderWidth: 3,
+      borderColor: colors.background,
+      alignItems: "center",
+      justifyContent: "center",
+      elevation: 3,
+    },
 
-  changePhotoButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.xs,
-    marginTop: sizes.sm,
-    paddingVertical: sizes.xs,
-    paddingHorizontal: sizes.sm,
-  },
+    changePhotoButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.xs,
+      marginTop: sizes.sm,
+      paddingVertical: sizes.xs,
+      paddingHorizontal: sizes.sm,
+    },
 
-  changePhotoText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.primary,
-  },
+    changePhotoText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.primary,
+    },
 
-  // Form Card
-  formCard: {
-    backgroundColor: lightColors.cardBg,
-    borderRadius: sizes.radiusLg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    padding: sizes.md,
-    gap: sizes.md,
-  },
+    // Form Card
+    formCard: {
+      backgroundColor: colors.cardBg,
+      borderRadius: sizes.radiusLg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: sizes.md,
+      gap: sizes.md,
+    },
 
-  inputGroup: {
-    gap: sizes.xs,
-  },
+    inputGroup: {
+      gap: sizes.xs,
+    },
 
-  labelRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+    labelRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
 
-  inputLabel: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.text,
-  },
+    inputLabel: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.text,
+    },
 
-  requiredStar: {
-    color: lightColors.danger,
-    fontWeight: "700",
-  },
+    requiredStar: {
+      color: colors.danger,
+      fontWeight: "700",
+    },
 
-  optionalBadge: {
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    backgroundColor: lightColors.inputBg,
-    paddingHorizontal: sizes.xs * 1.5,
-    paddingVertical: 2,
-    borderRadius: sizes.radiusSm,
-  },
+    optionalBadge: {
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      backgroundColor: colors.inputBg,
+      paddingHorizontal: sizes.xs * 1.5,
+      paddingVertical: 2,
+      borderRadius: sizes.radiusSm,
+    },
 
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: lightColors.inputBg,
-    borderRadius: sizes.radiusMd,
-    borderWidth: 1,
-    borderColor: "transparent",
-    paddingHorizontal: sizes.md,
-    height: 52,
-  },
+    inputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.inputBg,
+      borderRadius: sizes.radiusMd,
+      borderWidth: 1,
+      borderColor: "transparent",
+      paddingHorizontal: sizes.md,
+      height: 52,
+    },
 
-  inputIcon: {
-    marginRight: sizes.sm,
-  },
+    inputIcon: {
+      marginRight: sizes.sm,
+    },
 
-  textInput: {
-    flex: 1,
-    fontSize: sizes.fontMd,
-    color: lightColors.text,
-    paddingVertical: 0,
-  },
+    textInput: {
+      flex: 1,
+      fontSize: sizes.fontMd,
+      color: colors.text,
+      paddingVertical: 0,
+    },
 
-  // Save Button
-  saveButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: sizes.sm,
-    backgroundColor: lightColors.primary,
-    height: 54,
-    borderRadius: sizes.radiusMd,
-    marginTop: sizes.lg,
-    shadowColor: lightColors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
+    // Save Button
+    saveButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: sizes.sm,
+      backgroundColor: colors.primary,
+      height: 54,
+      borderRadius: sizes.radiusMd,
+      marginTop: sizes.lg,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    },
 
-  saveButtonText: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.white,
-  },
+    saveButtonText: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.white,
+    },
 
-  // Modal / Bottom Sheet
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
+    // Modal / Bottom Sheet
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "flex-end",
+    },
 
-  modalContent: {
-    backgroundColor: lightColors.cardBg,
-    borderTopLeftRadius: sizes.radiusXl,
-    borderTopRightRadius: sizes.radiusXl,
-    paddingHorizontal: sizes.lg,
-    paddingTop: sizes.sm,
-    paddingBottom: Platform.OS === "ios" ? sizes.xl + 10 : sizes.xl,
-  },
+    modalContent: {
+      backgroundColor: colors.cardBg,
+      borderTopLeftRadius: sizes.radiusXl,
+      borderTopRightRadius: sizes.radiusXl,
+      paddingHorizontal: sizes.lg,
+      paddingTop: sizes.sm,
+      paddingBottom: Platform.OS === "ios" ? sizes.xl + 10 : sizes.xl,
+    },
 
-  modalHandle: {
-    width: 40,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: lightColors.border,
-    alignSelf: "center",
-    marginBottom: sizes.md,
-  },
+    modalHandle: {
+      width: 40,
+      height: 5,
+      borderRadius: 2.5,
+      backgroundColor: colors.border,
+      alignSelf: "center",
+      marginBottom: sizes.md,
+    },
 
-  modalTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-    textAlign: "center",
-  },
+    modalTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+      textAlign: "center",
+    },
 
-  modalSubtitle: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-    textAlign: "center",
-    marginTop: sizes.xs,
-    marginBottom: sizes.lg,
-  },
+    modalSubtitle: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+      textAlign: "center",
+      marginTop: sizes.xs,
+      marginBottom: sizes.lg,
+    },
 
-  modalOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: sizes.md,
-    borderBottomWidth: 1,
-    borderBottomColor: lightColors.border,
-  },
+    modalOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: sizes.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  modalOptionIconContainer: {
-    width: 46,
-    height: 46,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: sizes.md,
-  },
+    modalOptionIconContainer: {
+      width: 46,
+      height: 46,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: sizes.md,
+    },
 
-  modalOptionTextContainer: {
-    flex: 1,
-  },
+    modalOptionTextContainer: {
+      flex: 1,
+    },
 
-  modalOptionTitle: {
-    fontSize: sizes.fontMd,
-    fontWeight: "600",
-    color: lightColors.text,
-  },
+    modalOptionTitle: {
+      fontSize: sizes.fontMd,
+      fontWeight: "600",
+      color: colors.text,
+    },
 
-  modalOptionSubtitle: {
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    marginTop: 2,
-  },
+    modalOptionSubtitle: {
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      marginTop: 2,
+    },
 
-  modalCancelButton: {
-    marginTop: sizes.md,
-    paddingVertical: sizes.md,
-    borderRadius: sizes.radiusMd,   
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-  },
+    modalCancelButton: {
+      marginTop: sizes.md,
+      paddingVertical: sizes.md,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+    },
 
-  modalCancelText: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
-});    
+    modalCancelText: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.text,
+    },
+  });

@@ -6,16 +6,17 @@ import {
   ScrollView,
   Pressable,
   Image,
+  Switch,
 } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { lightColors } from '../constants/colors';
 import sizes from '../constants/sizes';
 import type { RootStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useTheme, type ThemeColors } from '../context/ThemeContext';
 
 const menuItems = [
   {
@@ -47,6 +48,9 @@ const menuItems = [
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { user } = useAuth();
+  const { colors, isDark, toggleTheme } = useTheme();
+
+  const styles = createStyles(colors);
 
   const handleMenuPress = (item: (typeof menuItems)[0]) => {
     switch (item.id) {
@@ -88,7 +92,7 @@ export default function ProfileScreen() {
             <Ionicons
               name="settings-outline"
               size={sizes.fontXl}
-              color={lightColors.text}
+              color={colors.text}
             />
           </Pressable>
         </View>
@@ -121,12 +125,12 @@ export default function ProfileScreen() {
             <Ionicons
               name="create-outline"
               size={sizes.fontXl}
-              color={lightColors.primary}
+              color={colors.primary}
             />
           </Pressable>
         </View>
 
-        {/* Account Section */}
+        {/* My Account Section */}
         <Text style={styles.sectionTitle}>
           My Account
         </Text>
@@ -144,7 +148,7 @@ export default function ProfileScreen() {
                 <Ionicons
                   name={item.icon}
                   size={sizes.fontXl}
-                  color={lightColors.primary}
+                  color={colors.primary}
                 />
               </View>
 
@@ -161,10 +165,46 @@ export default function ProfileScreen() {
               <Ionicons
                 name="chevron-forward"
                 size={sizes.fontLg}
-                color={lightColors.mutedText}
+                color={colors.mutedText}
               />
             </Pressable>
           ))}
+        </View>
+
+        {/* App Appearance Section */}
+        <Text style={styles.sectionTitle}>
+          App Appearance
+        </Text>
+
+        <View style={styles.appearanceCard}>
+          <View style={styles.appearanceRow}>
+            <View style={styles.appearanceIconBg}>
+              <Ionicons
+                name={isDark ? 'moon' : 'sunny-outline'}
+                size={sizes.fontXl}
+                color={colors.primary}
+              />
+            </View>
+
+            <View style={styles.appearanceInfo}>
+              <Text style={styles.appearanceTitle}>Dark Mode</Text>
+              <Text style={styles.appearanceSubtitle}>
+                Switch app theme
+              </Text>
+            </View>
+
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{
+                false: colors.border,
+                true: colors.primaryLight,
+              }}
+              thumbColor={isDark ? colors.primary : colors.white}
+              accessibilityRole="switch"
+              accessibilityLabel="Toggle dark mode"
+            />
+          </View>
         </View>
 
         {/* Logout */}
@@ -175,7 +215,7 @@ export default function ProfileScreen() {
           <Ionicons
             name="log-out-outline"
             size={sizes.fontLg}
-            color={lightColors.danger}
+            color={colors.danger}
           />
 
           <Text style={styles.logoutText}>
@@ -191,162 +231,205 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    paddingHorizontal: sizes.lg,
-    paddingBottom: sizes.xl,
-  },
+    container: {
+      paddingHorizontal: sizes.lg,
+      paddingBottom: sizes.bottomNavInset,
+    },
 
-  // Header
-  header: {
-    paddingTop: sizes.md,
-    marginBottom: sizes.lg,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+    // Header
+    header: {
+      paddingTop: sizes.md,
+      marginBottom: sizes.lg,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
 
-  title: {
-    fontSize: sizes.fontXxl,
-    fontWeight: '800',
-    color: lightColors.text,
-  },
+    title: {
+      fontSize: sizes.fontXxl,
+      fontWeight: '800',
+      color: colors.text,
+    },
 
-  settingsButton: {
-    width: 44,
-    height: 44,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    settingsButton: {
+      width: 44,
+      height: 44,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
 
-  // Profile
-  profileCard: {
-    padding: sizes.md,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+    // Profile
+    profileCard: {
+      padding: sizes.md,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
 
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
+    avatar: {
+      width: 64,
+      height: 64,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
 
-  avatarImage: {
-    width: '100%',
-    height: '100%',
-  },
+    avatarImage: {
+      width: '100%',
+      height: '100%',
+    },
 
-  profileInfo: {
-    flex: 1,
-    marginLeft: sizes.md,
-  },
+    profileInfo: {
+      flex: 1,
+      marginLeft: sizes.md,
+    },
 
-  name: {
-    fontSize: sizes.fontLg,
-    fontWeight: '700',
-    color: lightColors.text,
-  },
+    name: {
+      fontSize: sizes.fontLg,
+      fontWeight: '700',
+      color: colors.text,
+    },
 
-  email: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-  },
+    email: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+    },
 
-  // Account
-  sectionTitle: {
-    marginTop: sizes.xl,
-    marginBottom: sizes.md,
-    fontSize: sizes.fontLg,
-    fontWeight: '700',
-    color: lightColors.text,
-  },
+    // Account
+    sectionTitle: {
+      marginTop: sizes.xl,
+      marginBottom: sizes.md,
+      fontSize: sizes.fontLg,
+      fontWeight: '700',
+      color: colors.text,
+    },
 
-  menuContainer: {
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    overflow: 'hidden',
-  },
+    menuContainer: {
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
+    },
 
-  menuItem: {
-    minHeight: 76,
-    paddingHorizontal: sizes.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: lightColors.border,
-  },
+    menuItem: {
+      minHeight: 76,
+      paddingHorizontal: sizes.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  menuIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.inputBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    menuIcon: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
 
-  menuInfo: {
-    flex: 1,
-    marginLeft: sizes.md,
-  },
+    menuInfo: {
+      flex: 1,
+      marginLeft: sizes.md,
+    },
 
-  menuTitle: {
-    fontSize: sizes.fontMd,
-    fontWeight: '600',
-    color: lightColors.text,
-  },
+    menuTitle: {
+      fontSize: sizes.fontMd,
+      fontWeight: '600',
+      color: colors.text,
+    },
 
-  menuSubtitle: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-  },
+    menuSubtitle: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+    },
 
-  // Logout
-  logoutButton: {
-    height: 52,
-    marginTop: sizes.lg,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: sizes.sm,
-  },
+    // App Appearance card
+    appearanceCard: {
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
+    },
 
-  logoutText: {
-    fontSize: sizes.fontMd,
-    fontWeight: '700',
-    color: lightColors.danger,
-  },
+    appearanceRow: {
+      minHeight: 76,
+      paddingHorizontal: sizes.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
 
-  version: {
-    marginTop: sizes.lg,
-    textAlign: 'center',
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-  },
-});
+    appearanceIconBg: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+
+    appearanceInfo: {
+      flex: 1,
+      marginLeft: sizes.md,
+    },
+
+    appearanceTitle: {
+      fontSize: sizes.fontMd,
+      fontWeight: '600',
+      color: colors.text,
+    },
+
+    appearanceSubtitle: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+    },
+
+    // Logout
+    logoutButton: {
+      height: 52,
+      marginTop: sizes.lg,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: sizes.sm,
+    },
+
+    logoutText: {
+      fontSize: sizes.fontMd,
+      fontWeight: '700',
+      color: colors.danger,
+    },
+
+    version: {
+      marginTop: sizes.lg,
+      textAlign: 'center',
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+    },
+  });

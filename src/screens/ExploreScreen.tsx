@@ -14,7 +14,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
 
@@ -22,6 +21,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getProducts } from "../services/productService";
 import { useFavorites } from "../context/FavoritesContext";
 import { useCart } from "../context/CartContext";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 import ProductCard from "../components/ProductCard";
 
 export default function ExploreScreen() {
@@ -31,6 +31,7 @@ export default function ExploreScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { isFavorite, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
+  const { colors } = useTheme();
 
   // Fetch products from API
   const {
@@ -55,6 +56,8 @@ export default function ExploreScreen() {
       ? products
       : products.filter((product) => product.category === selectedCategory);
 
+  const styles = createStyles(colors);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
@@ -69,7 +72,7 @@ export default function ExploreScreen() {
           <Ionicons
             name="options-outline"
             size={sizes.fontXl}
-            color={lightColors.text}
+            color={colors.text}
           />
         </Pressable>
       </View>
@@ -79,25 +82,32 @@ export default function ExploreScreen() {
         <Ionicons
           name="search-outline"
           size={sizes.fontLg}
-          color={lightColors.mutedText}
+          color={colors.mutedText}
         />
 
         <TextInput
           style={styles.searchInput}
           placeholder="Search products..."
-          placeholderTextColor={lightColors.mutedText}
+          placeholderTextColor={colors.mutedText}
           value={searchQuery}
           onChangeText={setSearchQuery}
           autoCapitalize="none"
         />
 
-        <Pressable>
-          <Ionicons
-            name="mic-outline"
-            size={sizes.fontLg}
-            color={lightColors.mutedText}
-          />
-        </Pressable>
+        {searchQuery.length > 0 && (
+          <Pressable
+            onPress={() => setSearchQuery("")}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
+          >
+            <Ionicons
+              name="close-circle"
+              size={sizes.fontLg}
+              color={colors.mutedText}
+            />
+          </Pressable>
+        )}
       </View>
 
       {/* Categories */}
@@ -106,7 +116,7 @@ export default function ExploreScreen() {
 
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={lightColors.primary} />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.loadingText}>Loading products...</Text>
           </View>
         ) : isError ? (
@@ -114,7 +124,7 @@ export default function ExploreScreen() {
             <Ionicons
               name="alert-circle-outline"
               size={50}
-              color={lightColors.primary}
+              color={colors.primary}
             />
 
             <Text style={styles.errorText}>Failed to load products</Text>
@@ -159,7 +169,7 @@ export default function ExploreScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={lightColors.primary} />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Loading products...</Text>
         </View>
       ) : isError ? (
@@ -167,7 +177,7 @@ export default function ExploreScreen() {
           <Ionicons
             name="alert-circle-outline"
             size={50}
-            color={lightColors.primary}
+            color={colors.primary}
           />
 
           <Text style={styles.errorText}>Failed to load products</Text>
@@ -198,150 +208,151 @@ export default function ExploreScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-    paddingHorizontal: sizes.lg,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: sizes.lg,
+    },
 
-  // Header
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: sizes.md,
-    marginBottom: sizes.md,
-  },
+    // Header
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingTop: sizes.md,
+      marginBottom: sizes.md,
+    },
 
-  smallTitle: {
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-    letterSpacing: 1,
-    color: lightColors.primary,
-  },
+    smallTitle: {
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+      letterSpacing: 1,
+      color: colors.primary,
+    },
 
-  title: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontXxl,
-    fontWeight: "800",
-    color: lightColors.text,
-  },
+    title: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontXxl,
+      fontWeight: "800",
+      color: colors.text,
+    },
 
-  filterButton: {
-    width: 44,
-    height: 44,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    filterButton: {
+      width: 44,
+      height: 44,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  // Search
-  searchContainer: {
-    height: 52,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: sizes.md,
-    backgroundColor: lightColors.inputBg,
-    borderRadius: sizes.radiusMd,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-  },
+    // Search
+    searchContainer: {
+      height: 52,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: sizes.md,
+      backgroundColor: colors.inputBg,
+      borderRadius: sizes.radiusMd,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  searchInput: {
-    flex: 1,
-    marginHorizontal: sizes.sm,
-    fontSize: sizes.fontMd,
-    color: lightColors.text,
-  },
+    searchInput: {
+      flex: 1,
+      marginHorizontal: sizes.sm,
+      fontSize: sizes.fontMd,
+      color: colors.text,
+    },
 
-  // Categories
-  categorySection: {
-    marginTop: sizes.lg,
-  },
+    // Categories
+    categorySection: {
+      marginTop: sizes.lg,
+    },
 
-  sectionTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    sectionTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  categoryList: {
-    paddingVertical: sizes.md,
-    gap: sizes.sm,
-  },
+    categoryList: {
+      paddingVertical: sizes.md,
+      gap: sizes.sm,
+    },
 
-  categoryButton: {
-    paddingVertical: sizes.sm,
-    paddingHorizontal: sizes.md,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-  },
+    categoryButton: {
+      paddingVertical: sizes.sm,
+      paddingHorizontal: sizes.md,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  activeCategory: {
-    backgroundColor: lightColors.primary,
-    borderColor: lightColors.primary,
-  },
+    activeCategory: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
 
-  categoryText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.mutedText,
-  },
+    categoryText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.mutedText,
+    },
 
-  activeCategoryText: {
-    color: lightColors.white,
-  },
+    activeCategoryText: {
+      color: colors.white,
+    },
 
-  // Products
-  productsHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: sizes.md,
-  },
+    // Products
+    productsHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: sizes.md,
+    },
 
-  productCount: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-  },
+    productCount: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+    },
 
-  productList: {
-    paddingBottom: sizes.xl,
-  },
+    productList: {
+      paddingBottom: sizes.bottomNavInset,
+    },
 
-  productRow: {
-    justifyContent: "space-between",
-    marginBottom: sizes.lg,
-  },
+    productRow: {
+      justifyContent: "space-between",
+      marginBottom: sizes.lg,
+    },
 
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    center: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  loadingText: {
-    marginTop: sizes.md,
-    fontSize: sizes.fontMd,
-    color: lightColors.text,
-  },
+    loadingText: {
+      marginTop: sizes.md,
+      fontSize: sizes.fontMd,
+      color: colors.text,
+    },
 
-  errorText: {
-    marginTop: sizes.md,
-    fontSize: sizes.fontMd,
-    color: lightColors.text,
-  },
+    errorText: {
+      marginTop: sizes.md,
+      fontSize: sizes.fontMd,
+      color: colors.text,
+    },
 
-  noResultsText: {
-    textAlign: "center",
-    marginTop: sizes.xl,
-    fontSize: sizes.fontMd,
-    color: lightColors.mutedText,
-  },
-});
+    noResultsText: {
+      textAlign: "center",
+      marginTop: sizes.xl,
+      fontSize: sizes.fontMd,
+      color: colors.mutedText,
+    },
+  });

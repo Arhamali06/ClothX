@@ -7,21 +7,24 @@ import { AuthProvider } from './src/context/AuthContext';
 import { FavoritesProvider } from './src/context/FavoritesContext';
 import { CartProvider } from './src/context/CartContext';
 import { OrdersProvider } from './src/context/OrdersContext';
+import { ThemeProvider } from './src/context/ThemeContext';
 
 const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <FavoritesProvider>
-          <CartProvider>
-            <OrdersProvider>
-              <RootNavigator />
-            </OrdersProvider>
-          </CartProvider>
-        </FavoritesProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <FavoritesProvider>
+            <CartProvider>
+              <OrdersProvider>
+                <RootNavigator />
+              </OrdersProvider>
+            </CartProvider>
+          </FavoritesProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

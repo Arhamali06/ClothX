@@ -11,9 +11,9 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import type { RootStackParamList } from "../types/navigation";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 
 interface Address {
   id: string;
@@ -51,6 +51,7 @@ export default function AddressesScreen() {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [addresses, setAddresses] = useState<Address[]>(mockAddresses);
   const [selectedId, setSelectedId] = useState<string>("1");
+  const { colors } = useTheme();
 
   const handleSetDefault = (id: string) => {
     setSelectedId(id);
@@ -66,6 +67,8 @@ export default function AddressesScreen() {
     setAddresses((prev) => prev.filter((addr) => addr.id !== id));
   };
 
+  const styles = createStyles(colors);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
@@ -79,7 +82,7 @@ export default function AddressesScreen() {
           <Ionicons
             name="arrow-back"
             size={sizes.fontXl}
-            color={lightColors.text}
+            color={colors.text}
           />
         </Pressable>
 
@@ -117,7 +120,7 @@ export default function AddressesScreen() {
                           : "location-outline"
                       }
                       size={14}
-                      color={lightColors.primary}
+                      color={colors.primary}
                     />
                     <Text style={styles.tagText}>{address.tag}</Text>
                   </View>
@@ -157,7 +160,7 @@ export default function AddressesScreen() {
                   <Ionicons
                     name="create-outline"
                     size={16}
-                    color={lightColors.text}
+                    color={colors.text}
                   />
                   <Text style={styles.actionButtonText}>Edit</Text>
                 </Pressable>
@@ -169,12 +172,12 @@ export default function AddressesScreen() {
                   <Ionicons
                     name="trash-outline"
                     size={16}
-                    color={lightColors.danger}
+                    color={colors.danger}
                   />
                   <Text
                     style={[
                       styles.actionButtonText,
-                      { color: lightColors.danger },
+                      { color: colors.danger },
                     ]}
                   >
                     Delete
@@ -194,7 +197,7 @@ export default function AddressesScreen() {
           <Ionicons
             name="add-circle-outline"
             size={sizes.fontLg}
-            color={lightColors.white}
+            color={colors.white}
           />
           <Text style={styles.addButtonText}>ADD NEW ADDRESS</Text>
         </Pressable>
@@ -203,185 +206,186 @@ export default function AddressesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  header: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: sizes.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: lightColors.border,
-  },
+    header: {
+      height: 60,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: sizes.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
 
-  backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    backButton: {
+      width: 42,
+      height: 42,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  headerTitle: {
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    headerTitle: {
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  placeholder: {
-    width: 42,
-  },
+    placeholder: {
+      width: 42,
+    },
 
-  contentContainer: {
-    padding: sizes.lg,
-    paddingBottom: sizes.xl,
-    gap: sizes.md,
-  },
+    contentContainer: {
+      padding: sizes.lg,
+      paddingBottom: sizes.xl,
+      gap: sizes.md,
+    },
 
-  addressCard: {
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    padding: sizes.md,
-  },
+    addressCard: {
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: sizes.md,
+    },
 
-  addressCardSelected: {
-    borderColor: lightColors.primary,
-    backgroundColor: lightColors.white,
-  },
+    addressCardSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.cardBg,
+    },
 
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: sizes.sm,
-  },
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: sizes.sm,
+    },
 
-  tagContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.xs + 2,
-  },
+    tagContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.xs + 2,
+    },
 
-  tagBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: lightColors.inputBg,
-    paddingVertical: 4,
-    paddingHorizontal: sizes.sm,
-    borderRadius: sizes.radiusSm,
-  },
+    tagBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: colors.inputBg,
+      paddingVertical: 4,
+      paddingHorizontal: sizes.sm,
+      borderRadius: sizes.radiusSm,
+    },
 
-  tagText: {
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    tagText: {
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  defaultBadge: {
-    backgroundColor: `${lightColors.secondary}22`,
-    paddingVertical: 4,
-    paddingHorizontal: sizes.sm,
-    borderRadius: sizes.radiusSm,
-  },
+    defaultBadge: {
+      backgroundColor: `${colors.secondary}22`,
+      paddingVertical: 4,
+      paddingHorizontal: sizes.sm,
+      borderRadius: sizes.radiusSm,
+    },
 
-  defaultBadgeText: {
-    fontSize: 10,
-    fontWeight: "800",
-    color: lightColors.secondary,
-  },
+    defaultBadgeText: {
+      fontSize: 10,
+      fontWeight: "800",
+      color: colors.secondary,
+    },
 
-  radioCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: sizes.radiusRound,
-    borderWidth: 2,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    radioCircle: {
+      width: 22,
+      height: 22,
+      borderRadius: sizes.radiusRound,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  radioCircleSelected: {
-    borderColor: lightColors.primary,
-  },
+    radioCircleSelected: {
+      borderColor: colors.primary,
+    },
 
-  radioInnerCircle: {
-    width: 10,
-    height: 10,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.primary,
-  },
+    radioInnerCircle: {
+      width: 10,
+      height: 10,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.primary,
+    },
 
-  recipientName: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    recipientName: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  phoneText: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-    marginTop: 2,
-    marginBottom: sizes.xs,
-  },
+    phoneText: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+      marginTop: 2,
+      marginBottom: sizes.xs,
+    },
 
-  addressText: {
-    fontSize: sizes.fontSm,
-    color: lightColors.text,
-    lineHeight: 20,
-  },
+    addressText: {
+      fontSize: sizes.fontSm,
+      color: colors.text,
+      lineHeight: 20,
+    },
 
-  divider: {
-    height: 1,
-    backgroundColor: lightColors.border,
-    marginVertical: sizes.sm,
-  },
+    divider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: sizes.sm,
+    },
 
-  cardActionsRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: sizes.md,
-  },
+    cardActionsRow: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      gap: sizes.md,
+    },
 
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingVertical: 4,
-    paddingHorizontal: sizes.xs,
-  },
+    actionButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      paddingVertical: 4,
+      paddingHorizontal: sizes.xs,
+    },
 
-  actionButtonText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.text,
-  },
+    actionButtonText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.text,
+    },
 
-  addButton: {
-    height: 52,
-    marginTop: sizes.sm,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.primary,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: sizes.sm,
-  },
+    addButton: {
+      height: 52,
+      marginTop: sizes.sm,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.primary,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: sizes.sm,
+    },
 
-  addButtonText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    color: lightColors.white,
-  },
-});
+    addButtonText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "700",
+      letterSpacing: 0.5,
+      color: colors.white,
+    },
+  });

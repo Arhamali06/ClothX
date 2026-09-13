@@ -5,6 +5,7 @@ export const sizes = {
   md: 16,
   lg: 24,
   xl: 32,
+  bottomNavInset: 80,
 
   // Typography
   fontXs: 12,

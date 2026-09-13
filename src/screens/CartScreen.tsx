@@ -19,10 +19,10 @@ import type { CompositeNavigationProp } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { lightColors } from "../constants/colors";
 import sizes from "../constants/sizes";
 import { useCart, CartItem } from "../context/CartContext";
 import { useOrders, Order } from "../context/OrdersContext";
+import { useTheme, type ThemeColors } from "../context/ThemeContext";
 import type {
   BottomTabParamList,
   RootStackParamList,
@@ -45,6 +45,9 @@ function SwipeableCartItem({
 }: SwipeableCartItemProps) {
   const translateX = useRef(new Animated.Value(0)).current;
   const [isOpen, setIsOpen] = useState(false);
+  const { colors } = useTheme();
+
+  const swipeStyles = createStyles(colors);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -114,11 +117,11 @@ function SwipeableCartItem({
   const itemTotal = (item.price * item.quantity).toFixed(2);
 
   return (
-    <View style={styles.swipeContainer}>
+    <View style={swipeStyles.swipeContainer}>
       {/* Hidden Delete Action Revealed on Swipe */}
-      <View style={styles.hiddenActionContainer}>
+      <View style={swipeStyles.hiddenActionContainer}>
         <Pressable
-          style={styles.deleteActionButton}
+          style={swipeStyles.deleteActionButton}
           onPress={handleDelete}
           accessibilityRole="button"
           accessibilityLabel={`Remove ${item.title} from cart`}
@@ -126,16 +129,16 @@ function SwipeableCartItem({
           <Ionicons
             name="trash-outline"
             size={22}
-            color={lightColors.white}
+            color={colors.white}
           />
-          <Text style={styles.deleteActionText}>Delete</Text>
+          <Text style={swipeStyles.deleteActionText}>Delete</Text>
         </Pressable>
       </View>
 
       {/* Foreground Cart Item Card */}
       <Animated.View
         style={[
-          styles.cartItem,
+          swipeStyles.cartItem,
           {
             transform: [{ translateX }],
           },
@@ -143,7 +146,7 @@ function SwipeableCartItem({
         {...panResponder.panHandlers}
       >
         <Pressable
-          style={styles.cardPressable}
+          style={swipeStyles.cardPressable}
           onPress={() => {
             if (isOpen) {
               closeSwipe();
@@ -153,38 +156,38 @@ function SwipeableCartItem({
           }}
         >
           {/* Product Image */}
-          <View style={styles.productImage}>
+          <View style={swipeStyles.productImage}>
             {item.thumbnail ? (
               <Image
                 source={{ uri: item.thumbnail }}
-                style={styles.productImageStyle}
+                style={swipeStyles.productImageStyle}
                 resizeMode="cover"
               />
             ) : (
               <Ionicons
                 name="image-outline"
                 size={36}
-                color={lightColors.mutedText}
+                color={colors.mutedText}
               />
             )}
           </View>
 
           {/* Product Info */}
-          <View style={styles.productInfo}>
-            <Text style={styles.productName} numberOfLines={1}>
+          <View style={swipeStyles.productInfo}>
+            <Text style={swipeStyles.productName} numberOfLines={1}>
               {item.title}
             </Text>
 
-            <Text style={styles.productCategory}>
+            <Text style={swipeStyles.productCategory}>
               {item.category}
               {item.selectedSize ? ` • Size ${item.selectedSize}` : ""}
             </Text>
 
-            <View style={styles.priceRow}>
-              <Text style={styles.productPrice}>${itemTotal}</Text>
+            <View style={swipeStyles.priceRow}>
+              <Text style={swipeStyles.productPrice}>${itemTotal}</Text>
               {item.discountPercentage ? (
-                <View style={styles.discountBadge}>
-                  <Text style={styles.discountText}>
+                <View style={swipeStyles.discountBadge}>
+                  <Text style={swipeStyles.discountText}>
                     {item.discountPercentage}% OFF
                   </Text>
                 </View>
@@ -192,11 +195,11 @@ function SwipeableCartItem({
             </View>
 
             {/* Quantity */}
-            <View style={styles.quantityContainer}>
+            <View style={swipeStyles.quantityContainer}>
               <Pressable
                 style={[
-                  styles.quantityButton,
-                  item.quantity <= 1 && styles.quantityButtonDisabled,
+                  swipeStyles.quantityButton,
+                  item.quantity <= 1 && swipeStyles.quantityButtonDisabled,
                 ]}
                 onPress={() => {
                   if (item.quantity > 1) {
@@ -212,16 +215,16 @@ function SwipeableCartItem({
                   size={16}
                   color={
                     item.quantity <= 1
-                      ? lightColors.mutedText
-                      : lightColors.text
+                      ? colors.mutedText
+                      : colors.text
                   }
                 />
               </Pressable>
 
-              <Text style={styles.quantity}>{item.quantity}</Text>
+              <Text style={swipeStyles.quantity}>{item.quantity}</Text>
 
               <Pressable
-                style={styles.quantityButton}
+                style={swipeStyles.quantityButton}
                 onPress={() => onUpdateQuantity(item.id, item.quantity + 1)}
                 accessibilityRole="button"
                 accessibilityLabel="Increase quantity"
@@ -229,7 +232,7 @@ function SwipeableCartItem({
                 <Ionicons
                   name="add"
                   size={16}
-                  color={lightColors.text}
+                  color={colors.text}
                 />
               </Pressable>
             </View>
@@ -267,9 +270,12 @@ export default function CartScreen() {
   } = useCart();
 
   const { placeOrder } = useOrders();
+  const { colors, isDark } = useTheme();
 
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
   const toastAnim = useRef(new Animated.Value(0)).current;
+
+  const styles = createStyles(colors);
 
   const handleProductPress = (item: CartItem) => {
     navigation.navigate("ProductDetails", {
@@ -348,7 +354,7 @@ export default function CartScreen() {
                 <Ionicons
                   name="checkmark-circle"
                   size={28}
-                  color={lightColors.secondary}
+                  color={colors.secondary}
                 />
               </View>
 
@@ -379,7 +385,7 @@ export default function CartScreen() {
                 <Ionicons
                   name="close"
                   size={20}
-                  color={lightColors.mutedText}
+                  color={colors.mutedText}
                 />
               </Pressable>
             </View>
@@ -389,6 +395,7 @@ export default function CartScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
+        indicatorStyle={isDark ? "white" : "black"}
         contentContainerStyle={[
           styles.container,
           (cartItems.length === 0 || isLoading) && styles.emptyContainerStyle,
@@ -397,8 +404,9 @@ export default function CartScreen() {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={refreshCart}
-            colors={[lightColors.primary]}
-            tintColor={lightColors.primary}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+            progressBackgroundColor={colors.cardBg}
           />
         }
       >
@@ -413,7 +421,7 @@ export default function CartScreen() {
             <Ionicons
               name="bag-outline"
               size={sizes.fontXl}
-              color={lightColors.primary}
+              color={colors.primary}
             />
             {uniqueProductsCount > 0 && (
               <View style={styles.headerBadge}>
@@ -429,7 +437,7 @@ export default function CartScreen() {
             <Ionicons
               name="alert-circle-outline"
               size={20}
-              color={lightColors.danger}
+              color={colors.danger}
             />
             <Text style={styles.errorText}>{error}</Text>
             <Pressable
@@ -446,7 +454,7 @@ export default function CartScreen() {
         {/* Loading State */}
         {isLoading && cartItems.length === 0 ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={lightColors.primary} />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.loadingText}>Fetching your cart items...</Text>
           </View>
         ) : cartItems.length === 0 ? (
@@ -456,7 +464,7 @@ export default function CartScreen() {
               <Ionicons
                 name="bag-outline"
                 size={56}
-                color={lightColors.primary}
+                color={colors.primary}
               />
             </View>
             <Text style={styles.emptyTitle}>Your Cart is Empty</Text>
@@ -474,7 +482,7 @@ export default function CartScreen() {
               <Ionicons
                 name="arrow-forward"
                 size={sizes.fontMd}
-                color={lightColors.white}
+                color={colors.white}
               />
             </Pressable>
           </View>
@@ -544,7 +552,7 @@ export default function CartScreen() {
               <Ionicons
                 name="arrow-forward"
                 size={sizes.fontLg}
-                color={lightColors.white}
+                color={colors.white}
               />
             </Pressable>
           </>
@@ -554,461 +562,460 @@ export default function CartScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: lightColors.background,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    swipeContainer: {
+      position: "relative",
+      borderRadius: sizes.radiusMd,
+      overflow: "hidden",
+    },
 
-  toastContainer: {
-    position: "absolute",
-    top: 70,
-    left: sizes.lg,
-    right: sizes.lg,
-    zIndex: 999,
-    elevation: 8,
-  },
+    hiddenActionContainer: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      right: 0,
+      width: 75,
+      backgroundColor: colors.danger,
+      borderRadius: sizes.radiusMd,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  toastCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: lightColors.white,
-    borderRadius: sizes.radiusMd,
-    padding: sizes.md,
-    borderWidth: 1,
-    borderColor: `${lightColors.secondary}44`,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-  },
+    deleteActionButton: {
+      flex: 1,
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 2,
+    },
 
-  toastLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
+    deleteActionText: {
+      color: colors.white,
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+    },
 
-  toastIconContainer: {
-    marginRight: sizes.sm,
-  },
+    cartItem: {
+      minHeight: 125,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  toastTextContainer: {
-    flex: 1,
-  },
+    cardPressable: {
+      flexDirection: "row",
+      padding: sizes.sm,
+      width: "100%",
+    },
 
-  toastTitle: {
-    fontSize: sizes.fontSm + 1,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    productImage: {
+      width: 105,
+      height: 105,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+    },
 
-  toastSubtitle: {
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    marginTop: 2,
-  },
+    productImageStyle: {
+      width: "100%",
+      height: "100%",
+    },
 
-  toastActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.xs,
-    marginLeft: sizes.sm,
-  },
+    productInfo: {
+      flex: 1,
+      marginLeft: sizes.md,
+      paddingVertical: sizes.xs,
+    },
 
-  toastViewButton: {
-    backgroundColor: lightColors.primary,
-    paddingVertical: sizes.xs + 1,
-    paddingHorizontal: sizes.sm + 4,
-    borderRadius: sizes.radiusSm,
-  },
+    productName: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  toastViewButtonText: {
-    color: lightColors.white,
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-  },
+    productCategory: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      textTransform: "capitalize",
+    },
 
-  toastCloseButton: {
-    padding: sizes.xs,
-  },
+    priceRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.xs,
+      marginTop: sizes.xs,
+    },
 
-  container: {
-    paddingHorizontal: sizes.lg,
-    paddingBottom: sizes.xl,
-  },
+    productPrice: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.primary,
+    },
 
-  emptyContainerStyle: {
-    flexGrow: 1,
-  },
+    discountBadge: {
+      backgroundColor: `${colors.secondary}20`,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: sizes.radiusSm,
+    },
 
-  // Header
-  header: {
-    paddingTop: sizes.md,
-    marginBottom: sizes.lg,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+    discountText: {
+      color: colors.secondary,
+      fontSize: 10,
+      fontWeight: "700",
+    },
 
-  smallTitle: {
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-    letterSpacing: 1,
-    color: lightColors.primary,
-  },
+    quantityContainer: {
+      marginTop: sizes.sm,
+      flexDirection: "row",
+      alignItems: "center",
+    },
 
-  title: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontXxl,
-    fontWeight: "800",
-    color: lightColors.text,
-  },
+    quantityButton: {
+      width: 28,
+      height: 28,
+      borderRadius: sizes.radiusSm,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  cartIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
+    quantityButtonDisabled: {
+      opacity: 0.4,
+    },
 
-  headerBadge: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    backgroundColor: lightColors.primary,
-    borderRadius: sizes.radiusRound,
-    minWidth: 18,
-    height: 18,
-    paddingHorizontal: 4,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    quantity: {
+      marginHorizontal: sizes.sm,
+      fontSize: sizes.fontSm,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  headerBadgeText: {
-    color: lightColors.white,
-    fontSize: 10,
-    fontWeight: "700",
-  },
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  // Loading & Error States
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 80,
-  },
+    toastContainer: {
+      position: "absolute",
+      top: 70,
+      left: sizes.lg,
+      right: sizes.lg,
+      zIndex: 999,
+      elevation: 8,
+    },
 
-  loadingText: {
-    marginTop: sizes.md,
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-    fontWeight: "500",
-  },
+    toastCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      backgroundColor: colors.cardBg,
+      borderRadius: sizes.radiusMd,
+      padding: sizes.md,
+      borderWidth: 1,
+      borderColor: `${colors.secondary}44`,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+    },
 
-  errorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: `${lightColors.danger}15`,
-    padding: sizes.md,
-    borderRadius: sizes.radiusMd,
-    marginBottom: sizes.md,
-    gap: sizes.xs,
-  },
+    toastLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      flex: 1,
+    },
 
-  errorText: {
-    flex: 1,
-    fontSize: sizes.fontXs,
-    color: lightColors.danger,
-    fontWeight: "500",
-  },
+    toastIconContainer: {
+      marginRight: sizes.sm,
+    },
 
-  retryButton: {
-    backgroundColor: lightColors.danger,
-    paddingHorizontal: sizes.sm + 2,
-    paddingVertical: sizes.xs,
-    borderRadius: sizes.radiusSm,
-  },
+    toastTextContainer: {
+      flex: 1,
+    },
 
-  retryButtonText: {
-    color: lightColors.white,
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-  },
+    toastTitle: {
+      fontSize: sizes.fontSm + 1,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  // Cart List
-  cartList: {
-    gap: sizes.md,
-  },
+    toastSubtitle: {
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      marginTop: 2,
+    },
 
-  // Swipe Container & Item
-  swipeContainer: {
-    position: "relative",
-    borderRadius: sizes.radiusMd,
-    overflow: "hidden",
-  },
+    toastActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.xs,
+      marginLeft: sizes.sm,
+    },
 
-  hiddenActionContainer: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    right: 0,
-    width: 75,
-    backgroundColor: lightColors.danger,
-    borderRadius: sizes.radiusMd,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    toastViewButton: {
+      backgroundColor: colors.primary,
+      paddingVertical: sizes.xs + 1,
+      paddingHorizontal: sizes.sm + 4,
+      borderRadius: sizes.radiusSm,
+    },
 
-  deleteActionButton: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 2,
-  },
+    toastViewButtonText: {
+      color: colors.white,
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+    },
 
-  deleteActionText: {
-    color: lightColors.white,
-    fontSize: sizes.fontXs,
-    fontWeight: "700",
-  },
+    toastCloseButton: {
+      padding: sizes.xs,
+    },
 
-  cartItem: {
-    minHeight: 125,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-  },
+    container: {
+      paddingHorizontal: sizes.lg,
+      paddingBottom: sizes.bottomNavInset,
+    },
 
-  cardPressable: {
-    flexDirection: "row",
-    padding: sizes.sm,
-    width: "100%",
-  },
+    emptyContainerStyle: {
+      flexGrow: 1,
+    },
 
-  productImage: {
-    width: 105,
-    height: 105,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
+    // Header
+    header: {
+      paddingTop: sizes.md,
+      marginBottom: sizes.lg,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
 
-  productImageStyle: {
-    width: "100%",
-    height: "100%",
-  },
+    smallTitle: {
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+      letterSpacing: 1,
+      color: colors.primary,
+    },
 
-  productInfo: {
-    flex: 1,
-    marginLeft: sizes.md,
-    paddingVertical: sizes.xs,
-  },
+    title: {
+      marginTop: sizes.xs,
+      fontSize: sizes.fontXxl,
+      fontWeight: "800",
+      color: colors.text,
+    },
 
-  productName: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    cartIcon: {
+      width: 46,
+      height: 46,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+      position: "relative",
+    },
 
-  productCategory: {
-    marginTop: sizes.xs,
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    textTransform: "capitalize",
-  },
+    headerBadge: {
+      position: "absolute",
+      top: -4,
+      right: -4,
+      backgroundColor: colors.primary,
+      borderRadius: sizes.radiusRound,
+      minWidth: 18,
+      height: 18,
+      paddingHorizontal: 4,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  priceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.xs,
-    marginTop: sizes.xs,
-  },
+    headerBadgeText: {
+      color: colors.white,
+      fontSize: 10,
+      fontWeight: "700",
+    },
 
-  productPrice: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.primary,
-  },
+    // Loading & Error States
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingVertical: 80,
+    },
 
-  discountBadge: {
-    backgroundColor: `${lightColors.secondary}20`,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: sizes.radiusSm,
-  },
+    loadingText: {
+      marginTop: sizes.md,
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+      fontWeight: "500",
+    },
 
-  discountText: {
-    color: lightColors.secondary,
-    fontSize: 10,
-    fontWeight: "700",
-  },
+    errorContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: `${colors.danger}15`,
+      padding: sizes.md,
+      borderRadius: sizes.radiusMd,
+      marginBottom: sizes.md,
+      gap: sizes.xs,
+    },
 
-  // Quantity
-  quantityContainer: {
-    marginTop: sizes.sm,
-    flexDirection: "row",
-    alignItems: "center",
-  },
+    errorText: {
+      flex: 1,
+      fontSize: sizes.fontXs,
+      color: colors.danger,
+      fontWeight: "500",
+    },
 
-  quantityButton: {
-    width: 28,
-    height: 28,
-    borderRadius: sizes.radiusSm,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    retryButton: {
+      backgroundColor: colors.danger,
+      paddingHorizontal: sizes.sm + 2,
+      paddingVertical: sizes.xs,
+      borderRadius: sizes.radiusSm,
+    },
 
-  quantityButtonDisabled: {
-    opacity: 0.4,
-  },
+    retryButtonText: {
+      color: colors.white,
+      fontSize: sizes.fontXs,
+      fontWeight: "700",
+    },
 
-  quantity: {
-    marginHorizontal: sizes.sm,
-    fontSize: sizes.fontSm,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    // Cart List
+    cartList: {
+      gap: sizes.md,
+    },
 
-  swipeHintText: {
-    textAlign: "center",
-    fontSize: sizes.fontXs,
-    color: lightColors.mutedText,
-    marginTop: sizes.md,
-    fontStyle: "italic",
-  },
+    swipeHintText: {
+      textAlign: "center",
+      fontSize: sizes.fontXs,
+      color: colors.mutedText,
+      marginTop: sizes.md,
+      fontStyle: "italic",
+    },
 
-  // Summary
-  summary: {
-    marginTop: sizes.lg,
-    padding: sizes.md,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.cardBg,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-  },
+    // Summary
+    summary: {
+      marginTop: sizes.lg,
+      padding: sizes.md,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.cardBg,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  summaryTitle: {
-    marginBottom: sizes.md,
-    fontSize: sizes.fontLg,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    summaryTitle: {
+      marginBottom: sizes.md,
+      fontSize: sizes.fontLg,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  summaryRow: {
-    marginBottom: sizes.sm,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
+    summaryRow: {
+      marginBottom: sizes.sm,
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
 
-  summaryLabel: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-  },
+    summaryLabel: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+    },
 
-  summaryValue: {
-    fontSize: sizes.fontSm,
-    fontWeight: "600",
-    color: lightColors.text,
-  },
+    summaryValue: {
+      fontSize: sizes.fontSm,
+      fontWeight: "600",
+      color: colors.text,
+    },
 
-  divider: {
-    height: 1,
-    marginVertical: sizes.sm,
-    backgroundColor: lightColors.border,
-  },
+    divider: {
+      height: 1,
+      marginVertical: sizes.sm,
+      backgroundColor: colors.border,
+    },
 
-  totalLabel: {
-    fontSize: sizes.fontMd,
-    fontWeight: "700",
-    color: lightColors.text,
-  },
+    totalLabel: {
+      fontSize: sizes.fontMd,
+      fontWeight: "700",
+      color: colors.text,
+    },
 
-  totalValue: {
-    fontSize: sizes.fontLg,
-    fontWeight: "800",
-    color: lightColors.primary,
-  },
+    totalValue: {
+      fontSize: sizes.fontLg,
+      fontWeight: "800",
+      color: colors.primary,
+    },
 
-  // Checkout
-  checkoutButton: {
-    height: 52,
-    marginTop: sizes.lg,
-    borderRadius: sizes.radiusMd,
-    backgroundColor: lightColors.primary,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: sizes.sm,
-  },
+    // Checkout
+    checkoutButton: {
+      height: 52,
+      marginTop: sizes.lg,
+      borderRadius: sizes.radiusMd,
+      backgroundColor: colors.primary,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: sizes.sm,
+    },
 
-  checkoutText: {
-    fontSize: sizes.fontSm,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    color: lightColors.white,
-  },
+    checkoutText: {
+      fontSize: sizes.fontSm,
+      fontWeight: "700",
+      letterSpacing: 0.5,
+      color: colors.white,
+    },
 
-  // Empty State
-  emptyState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: sizes.xl,
-    paddingVertical: 60,
-  },
+    // Empty State
+    emptyState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: sizes.xl,
+      paddingVertical: 60,
+    },
 
-  emptyIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: sizes.radiusRound,
-    backgroundColor: lightColors.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: sizes.lg,
-  },
+    emptyIconCircle: {
+      width: 100,
+      height: 100,
+      borderRadius: sizes.radiusRound,
+      backgroundColor: colors.inputBg,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: sizes.lg,
+    },
 
-  emptyTitle: {
-    fontSize: sizes.fontXl,
-    fontWeight: "800",
-    color: lightColors.text,
-    textAlign: "center",
-    marginBottom: sizes.sm,
-  },
+    emptyTitle: {
+      fontSize: sizes.fontXl,
+      fontWeight: "800",
+      color: colors.text,
+      textAlign: "center",
+      marginBottom: sizes.sm,
+    },
 
-  emptySubtitle: {
-    fontSize: sizes.fontSm,
-    color: lightColors.mutedText,
-    textAlign: "center",
-    lineHeight: 20,
-    maxWidth: 280,
-    marginBottom: sizes.xl,
-  },
+    emptySubtitle: {
+      fontSize: sizes.fontSm,
+      color: colors.mutedText,
+      textAlign: "center",
+      lineHeight: 20,
+      maxWidth: 280,
+      marginBottom: sizes.xl,
+    },
 
-  exploreButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: sizes.xs,
-    backgroundColor: lightColors.primary,
-    paddingVertical: sizes.sm + 4,
-    paddingHorizontal: sizes.lg,
-    borderRadius: sizes.radiusMd,
-  },
+    exploreButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: sizes.xs,
+      backgroundColor: colors.primary,
+      paddingVertical: sizes.sm + 4,
+      paddingHorizontal: sizes.lg,
+      borderRadius: sizes.radiusMd,
+    },
 
-  exploreButtonText: {
-    color: lightColors.white,
-    fontWeight: "700",
-    fontSize: sizes.fontSm,
-  },
-});
+    exploreButtonText: {
+      color: colors.white,
+      fontWeight: "700",
+      fontSize: sizes.fontSm,
+    },
+  });
